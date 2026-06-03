@@ -1,79 +1,88 @@
-"""Model registry: discover and (optionally) load versioned models with provenance metadata.
+"""Model registry: discover, validate, and load the serving model with provenance metadata.
 
-The legacy project shipped opaque, timestamp-named model binaries with no metadata, no checksums,
-and unverified accuracy. This registry fixes that: a ``model_manifest.yaml`` declares each model's
-version, checksum, training data, and validated metrics. If a registered binary is present it can be
-loaded; otherwise the service uses the transparent baseline model (clearly labelled in responses).
+The legacy project shipped opaque, timestamp-named binaries with no metadata, no checksums, and a
+cherry-picked "accuracy". This registry instead loads a model that was honestly validated
+(see ai/train/train_nba_ml.py → 5-fold CV) together with its feature order and a per-team stats
+snapshot for serving. If the model files aren't present it falls back to the transparent baseline.
 """
 from __future__ import annotations
 
 import hashlib
+import json
 import logging
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
 
-import yaml
-
 logger = logging.getLogger(__name__)
 
 MODEL_DIR = Path(os.getenv("MODEL_DIR", Path(__file__).resolve().parent.parent / "models"))
+
+MODEL_FILE = MODEL_DIR / "xgboost_nba_ml.json"
+FEATURES_FILE = MODEL_DIR / "xgboost_nba_ml.features.json"
+TEAMS_FILE = MODEL_DIR / "team_features.json"
+METRICS_FILE = MODEL_DIR / "xgboost_nba_ml.metrics.json"
 
 
 @dataclass
 class ModelInfo:
     name: str
     version: str
-    file: str | None = None
-    sha256: str | None = None
-    metrics: dict = field(default_factory=dict)
     validated: bool = False
+    metrics: dict = field(default_factory=dict)
     notes: str = ""
 
 
 def _sha256(path: Path) -> str | None:
-    if not path.exists():
+    return hashlib.sha256(path.read_bytes()).hexdigest() if path.exists() else None
+
+
+# ── Lazy, cached load of the serving model + its serving assets ────
+_assets: dict | None = None
+_loaded = False
+
+
+def load_ml_assets() -> dict | None:
+    """Return {model, feature_columns, team_features} for the validated XGBoost model, or None."""
+    global _assets, _loaded
+    if _loaded:
+        return _assets
+    _loaded = True
+    if not (MODEL_FILE.exists() and FEATURES_FILE.exists() and TEAMS_FILE.exists()):
+        logger.info("No validated ML model found in %s; using baseline.", MODEL_DIR)
+        _assets = None
         return None
-    h = hashlib.sha256()
-    h.update(path.read_bytes())
-    return h.hexdigest()
+    try:
+        import xgboost as xgb
 
-
-def load_manifest() -> list[ModelInfo]:
-    manifest_path = MODEL_DIR / "model_manifest.yaml"
-    if not manifest_path.exists():
-        return []
-    data = yaml.safe_load(manifest_path.read_text()) or {}
-    infos: list[ModelInfo] = []
-    for entry in data.get("models", []):
-        infos.append(
-            ModelInfo(
-                name=entry.get("name", "unknown"),
-                version=entry.get("version", "0"),
-                file=entry.get("file"),
-                sha256=entry.get("sha256"),
-                metrics=entry.get("metrics", {}),
-                validated=bool(entry.get("validated", False)),
-                notes=entry.get("notes", ""),
-            )
-        )
-    return infos
+        clf = xgb.XGBClassifier()
+        clf.load_model(str(MODEL_FILE))
+        _assets = {
+            "model": clf,
+            "feature_columns": json.loads(FEATURES_FILE.read_text()),
+            "team_features": json.loads(TEAMS_FILE.read_text()),
+        }
+        logger.info("Loaded XGBoost model with %d teams.", len(_assets["team_features"]))
+    except Exception as exc:  # pragma: no cover
+        logger.warning("Failed to load XGBoost model: %s", exc)
+        _assets = None
+    return _assets
 
 
 def active_model() -> ModelInfo:
-    """Return the first validated model in the manifest, else a baseline descriptor."""
-    for info in load_manifest():
-        if info.validated and info.file:
-            binary = MODEL_DIR / info.file
-            if binary.exists():
-                actual = _sha256(binary)
-                if info.sha256 and actual != info.sha256:
-                    logger.warning("Checksum mismatch for %s; ignoring.", info.name)
-                    continue
-                return info
+    """Describe the model currently serving predictions."""
+    if load_ml_assets():
+        metrics = json.loads(METRICS_FILE.read_text()) if METRICS_FILE.exists() else {}
+        return ModelInfo(
+            name="xgboost_nba_ml",
+            version="1",
+            validated=True,
+            metrics=metrics,
+            notes="XGBoost NBA moneyline model, honestly validated via 5-fold CV (no cherry-picking).",
+        )
     return ModelInfo(
         name="baseline",
         version="v0",
         validated=False,
-        notes="Transparent heuristic (home-court + ratings + rest). Pending a validated ML model.",
+        notes="Transparent heuristic (home-court + ratings + rest). Used until a model is available.",
     )

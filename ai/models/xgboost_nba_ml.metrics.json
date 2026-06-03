@@ -1,0 +1,10 @@
+{
+  "model": "xgboost_nba_ml",
+  "accuracy": 0.643069798213695,
+  "log_loss": 0.6280937790870667,
+  "roc_auc": 0.684708937577615,
+  "n_test": 3023,
+  "cv_accuracy_mean": 0.6523982798544492,
+  "cv_accuracy_std": 0.008136266828788985,
+  "n_features": 106
+}
