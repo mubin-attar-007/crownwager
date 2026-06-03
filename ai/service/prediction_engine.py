@@ -1,0 +1,109 @@
+"""Prediction engine: turns game inputs into win probabilities and per-market picks.
+
+Produces moneyline (home/away) and over/under probabilities. Emits an `ensemble` pick (used by the
+backend's best-bets ranking) plus per-model entries (`nn`, `xgboost`) for display richness. The
+per-model entries are deterministic perturbations of the baseline so the demo is stable and
+reproducible (no randomness). When a validated model is registered, swap it in here.
+"""
+from __future__ import annotations
+
+import math
+
+from .feature_engineer import build_features, home_win_logit
+from .model_registry import ModelInfo, active_model
+from .schemas import GameIn, GamePrediction, ModelPick
+
+DISCLAIMER = "Informational only. Not financial advice. 18+. Please bet responsibly."
+
+
+def _sigmoid(x: float) -> float:
+    return 1.0 / (1.0 + math.exp(-x))
+
+
+def _clamp(p: float, lo: float = 0.02, hi: float = 0.98) -> float:
+    return max(lo, min(hi, p))
+
+
+def _moneyline_prob_home(game: GameIn) -> float:
+    feats = build_features(
+        game.home_rating, game.away_rating, game.home_rest_days, game.away_rest_days
+    )
+    return _clamp(_sigmoid(home_win_logit(feats)))
+
+
+def _total_over_prob(game: GameIn) -> float:
+    # Without live pace/efficiency data, totals are near coin-flips; nudge slightly by rating sum.
+    base = 0.5
+    if game.home_rating is not None and game.away_rating is not None:
+        base += 0.002 * ((game.home_rating + game.away_rating) - 0.0)
+    return _clamp(base, 0.35, 0.65)
+
+
+def _pick_for_selection(market: str, selection: str, game: GameIn, p_home: float, p_over: float) -> float:
+    """Probability the given offered selection wins, so it matches the odds for best-bets."""
+    if market == "moneyline":
+        if selection == game.home_team:
+            return p_home
+        if selection == game.away_team:
+            return 1.0 - p_home
+        return p_home  # default to home if selection unrecognized
+    if market == "total":
+        return p_over if selection.lower().startswith("over") else 1.0 - p_over
+    return 0.5
+
+
+def predict_game(game: GameIn, model: ModelInfo) -> GamePrediction:
+    p_home = _moneyline_prob_home(game)
+    p_over = _total_over_prob(game)
+
+    models: list[ModelPick] = []
+    for market, offer in game.market_odds.items():
+        prob = round(_pick_for_selection(market, offer.selection, game, p_home, p_over), 4)
+        # Ensemble (authoritative, used by best-bets ranking).
+        models.append(
+            ModelPick(
+                model_name="ensemble",
+                market=market,
+                pick=offer.selection,
+                win_probability=prob,
+                confidence=round(abs(prob - 0.5) * 2, 4),
+            )
+        )
+        # Deterministic per-model variants for display (xgboost slightly sharper, nn slightly softer).
+        models.append(
+            ModelPick(
+                model_name="xgboost", market=market, pick=offer.selection,
+                win_probability=round(_clamp(prob + 0.015), 4), confidence=round(abs(prob - 0.5) * 2, 4),
+            )
+        )
+        models.append(
+            ModelPick(
+                model_name="nn", market=market, pick=offer.selection,
+                win_probability=round(_clamp(prob - 0.015), 4), confidence=round(abs(prob - 0.5) * 2, 4),
+            )
+        )
+
+    # If no markets were requested, still expose the moneyline view for the home team.
+    if not game.market_odds:
+        models.append(
+            ModelPick(
+                model_name="ensemble", market="moneyline", pick=game.home_team,
+                win_probability=round(p_home, 4), confidence=round(abs(p_home - 0.5) * 2, 4),
+            )
+        )
+
+    return GamePrediction(
+        external_id=game.external_id,
+        home_team=game.home_team,
+        away_team=game.away_team,
+        sport_key=game.sport_key,
+        sport_title=game.sport_title,
+        commence_time=game.commence_time,
+        models=models,
+        market_odds=game.market_odds,
+    )
+
+
+def predict_games(games: list[GameIn]) -> tuple[list[GamePrediction], ModelInfo]:
+    model = active_model()
+    return [predict_game(g, model) for g in games], model

@@ -1,0 +1,56 @@
+# ─── Secrets & env ──────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.secret
+config/
+
+# ─── Python ─────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+venv_odds/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+coverage.xml
+
+# ─── Django ─────────────────────────────────────────────────────
+*.log
+db.sqlite3
+db.sqlite3-journal
+/backend/staticfiles/
+/backend/media/
+
+# ─── Node / Next.js ─────────────────────────────────────────────
+node_modules/
+.next/
+out/
+dist/
+*.tsbuildinfo
+.turbo/
+
+# ─── ML artifacts (large binaries never go in git) ──────────────
+ai/models/**/*.pb
+ai/models/**/variables/
+ai/models/**/*.h5
+ai/models/**/*.keras
+ai/data/raw/
+*.sqlite
+*.rar
+*.mat
+*.npy
+*.npz
+
+# ─── Archived legacy (kept on disk, out of git history) ─────────
+_archived/
+
+# ─── IDE / OS ───────────────────────────────────────────────────
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

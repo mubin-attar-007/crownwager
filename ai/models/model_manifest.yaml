@@ -1,0 +1,30 @@
+# Model registry manifest — declares provenance + validated metrics for each model.
+# The service only serves a model marked `validated: true` with a matching checksum; otherwise it
+# falls back to the transparent baseline. This fixes the legacy gap of opaque, unverified binaries.
+#
+# To promote the legacy XGBoost model (archived under
+# _archived/legacy_oddsaway/nba_betting/Models/XGBoost_*.json):
+#   1. Re-run ai/train/evaluate_backtest.py on a held-out season; confirm accuracy + ROI.
+#   2. Copy the .json into ai/models/ and fill in file + sha256 below.
+#   3. Set validated: true.
+
+models:
+  - name: baseline
+    version: v0
+    file: null
+    sha256: null
+    validated: false
+    notes: >
+      Transparent heuristic: home-court advantage + (optional) team-rating differential +
+      rest-day differential, mapped through a logistic function. Always available; used until a
+      validated ML model is promoted.
+    metrics: {}
+
+  # Example (disabled until validated):
+  # - name: xgboost_ml
+  #   version: "2024.1"
+  #   file: xgboost_ml_2024.json
+  #   sha256: "<fill-after-copy>"
+  #   validated: false
+  #   notes: "Legacy XGBoost moneyline model. Accuracy claim (~68%) UNVERIFIED — backtest first."
+  #   metrics: {accuracy: null, roi: null, sample: null}
