@@ -85,7 +85,7 @@ services:
       context: ..
       dockerfile: infrastructure/docker/Dockerfile.ai
     environment:
-      MODEL_DIR: /app/models
+      MODEL_DIR: /app/ai/models
     ports:
       - "8001:8001"
 

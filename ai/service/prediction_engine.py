@@ -10,7 +10,7 @@ from __future__ import annotations
 import math
 
 from .feature_engineer import build_features, home_win_logit
-from .model_registry import ModelInfo, active_model
+from .model_registry import ModelInfo, active_model, load_ml_assets
 from .schemas import GameIn, GamePrediction, ModelPick
 
 DISCLAIMER = "Informational only. Not financial advice. 18+. Please bet responsibly."
@@ -24,7 +24,28 @@ def _clamp(p: float, lo: float = 0.02, hi: float = 0.98) -> float:
     return max(lo, min(hi, p))
 
 
+def _model_prob_home(game: GameIn) -> float | None:
+    """Real XGBoost probability for the home team, if the model + both teams are available."""
+    assets = load_ml_assets()
+    if not assets:
+        return None
+    tf = assets["team_features"]
+    home, away = tf.get(game.home_team), tf.get(game.away_team)
+    if home is None or away is None:
+        return None
+    import numpy as np
+
+    cols = assets["feature_columns"]
+    vec = [(away.get(c[:-2], 0.0) if c.endswith(".1") else home.get(c, 0.0)) for c in cols]
+    p = float(assets["model"].predict_proba(np.array([vec], dtype=float))[0, 1])
+    return _clamp(p)
+
+
 def _moneyline_prob_home(game: GameIn) -> float:
+    # Prefer the validated XGBoost model; fall back to the transparent baseline.
+    p = _model_prob_home(game)
+    if p is not None:
+        return p
     feats = build_features(
         game.home_rating, game.away_rating, game.home_rest_days, game.away_rest_days
     )
