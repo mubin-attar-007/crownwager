@@ -1,0 +1,8 @@
+{
+  "name": "oddsaway-stitch",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@google/stitch-sdk": "*"
+  }
+}

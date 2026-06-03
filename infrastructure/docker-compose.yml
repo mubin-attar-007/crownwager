@@ -1,0 +1,104 @@
+# One-command local stack:  docker compose -f infrastructure/docker-compose.yml up --build
+# Services: Postgres, Redis, Django API, Celery worker + beat, AI service, Next.js frontend.
+name: oddsaway
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: oddsaway
+      POSTGRES_USER: oddsaway
+      POSTGRES_PASSWORD: oddsaway
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U oddsaway"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    ports:
+      - "6379:6379"
+
+  backend:
+    build:
+      context: ..
+      dockerfile: infrastructure/docker/Dockerfile.backend
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://oddsaway:oddsaway@db:5432/oddsaway
+      REDIS_URL: redis://redis:6379/0
+      CACHE_BACKEND: redis
+      AI_SERVICE_URL: http://ai:8001
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+             python manage.py seed_demo &&
+             (python manage.py refresh_predictions || true) &&
+             gunicorn config_project.wsgi:application --bind 0.0.0.0:8000 --workers 3"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+
+  celery:
+    build:
+      context: ..
+      dockerfile: infrastructure/docker/Dockerfile.backend
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://oddsaway:oddsaway@db:5432/oddsaway
+      REDIS_URL: redis://redis:6379/0
+      CACHE_BACKEND: redis
+    command: celery -A config_project worker -l info
+    depends_on:
+      - backend
+      - redis
+
+  beat:
+    build:
+      context: ..
+      dockerfile: infrastructure/docker/Dockerfile.backend
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://oddsaway:oddsaway@db:5432/oddsaway
+      REDIS_URL: redis://redis:6379/0
+      CACHE_BACKEND: redis
+    command: celery -A config_project beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    depends_on:
+      - backend
+      - redis
+
+  ai:
+    build:
+      context: ..
+      dockerfile: infrastructure/docker/Dockerfile.ai
+    environment:
+      MODEL_DIR: /app/models
+    ports:
+      - "8001:8001"
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: infrastructure/docker/Dockerfile.frontend
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:8000/api
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+
+volumes:
+  pgdata:

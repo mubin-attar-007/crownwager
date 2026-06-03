@@ -1,0 +1,21 @@
+# syntax=docker/dockerfile:1
+# AI prediction service (FastAPI). Python 3.12 for full numpy/scikit-learn/xgboost wheel coverage.
+FROM python:3.12-slim AS base
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    MODEL_DIR=/app/ai/models
+
+WORKDIR /app
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends build-essential curl libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY ai/requirements.txt /app/ai/requirements.txt
+RUN pip install -r ai/requirements.txt
+
+COPY ai/ /app/ai/
+
+EXPOSE 8001
+CMD ["uvicorn", "ai.service.app:app", "--host", "0.0.0.0", "--port", "8001"]

@@ -1,0 +1,21 @@
+# Keep the Docker build context small and fast.
+_archived/
+**/__pycache__/
+**/*.pyc
+.venv/
+venv/
+**/node_modules/
+**/.next/
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+*.sqlite
+*.sqlite3
+*.rar
+.git/
+**/.env
+**/staticfiles/
+**/media/
+ai/models/**/variables/
+ai/models/**/*.pb
+ai/data/raw/
