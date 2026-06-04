@@ -155,6 +155,40 @@ export interface ChatResponse {
   disclaimer: string;
 }
 
+export type BetStatus = "pending" | "won" | "lost" | "push";
+
+export interface TrackedBet {
+  id: number;
+  external_id: string;
+  sport_key: string;
+  home_team: string;
+  away_team: string;
+  market: string;
+  selection: string;
+  bookmaker: string;
+  american_odds: number;
+  stake: string;
+  status: BetStatus;
+  profit: string;
+  placed_at: string;
+  settled_at: string | null;
+}
+
+export interface BankrollStats {
+  record: string;
+  wins: number;
+  losses: number;
+  pushes: number;
+  total_staked: string;
+  total_profit: string;
+  roi_pct: string;
+  win_rate_pct: string;
+  settled_count: number;
+  pending_count: number;
+  pending_stake: string;
+  growth: { at: string; cumulative_profit: string }[];
+}
+
 export interface Paginated<T> {
   count: number;
   next: string | null;

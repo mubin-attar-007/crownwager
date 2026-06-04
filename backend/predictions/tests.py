@@ -163,6 +163,32 @@ def test_ai_client_health_false_on_connection_error() -> None:
     assert AIServiceClient(base_url="http://127.0.0.1:9").health() is False
 
 
+@pytest.mark.django_db
+def test_tracked_bets_require_auth(client: APIClient) -> None:
+    assert client.get("/api/tracked-bets/").status_code == 401
+    assert client.get("/api/bankroll/stats/").status_code == 401
+
+
+@pytest.mark.django_db
+def test_bet_tracking_and_bankroll_stats(client: APIClient) -> None:
+    from django.contrib.auth.models import User
+
+    user = User.objects.create_user(username="b@e.com", email="b@e.com", password="S3cure-pass-1")
+    client.force_authenticate(user=user)
+    r1 = client.post("/api/tracked-bets/", {"selection": "Lakers", "market": "moneyline", "american_odds": 100, "stake": "100.00"}, format="json")
+    r2 = client.post("/api/tracked-bets/", {"selection": "Celtics", "market": "moneyline", "american_odds": -110, "stake": "100.00"}, format="json")
+    assert r1.status_code == 201 and r2.status_code == 201
+    # Settle: bet1 won (+100 at +100 odds), bet2 lost (-100).
+    client.patch(f"/api/tracked-bets/{r1.json()['id']}/", {"status": "won"}, format="json")
+    client.patch(f"/api/tracked-bets/{r2.json()['id']}/", {"status": "lost"}, format="json")
+    stats = client.get("/api/bankroll/stats/").json()
+    assert stats["record"] == "1-1-0"
+    assert stats["total_staked"] == "200.00"
+    assert stats["total_profit"] == "0.00"   # +100 and -100
+    assert stats["win_rate_pct"] == "50.00"
+    assert len(stats["growth"]) == 2
+
+
 def test_games_from_odds_builds_moneyline_offer() -> None:
     from predictions.services.pipeline import games_from_odds
 

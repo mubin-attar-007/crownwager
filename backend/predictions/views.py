@@ -9,6 +9,7 @@ from __future__ import annotations
 from decimal import Decimal
 
 from django.conf import settings
+from django.utils import timezone
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status, viewsets
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -16,11 +17,11 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import BestBet, Game, SavedBet
-from .serializers import GameSerializer, SavedBetSerializer, bestbet_to_dict
+from .models import BestBet, Game, SavedBet, TrackedBet
+from .serializers import GameSerializer, SavedBetSerializer, TrackedBetSerializer, bestbet_to_dict
 from .services.best_bets import compute_best_bets
 from .services.pipeline import gather_predictions
-from .services.staking import recommended_stake
+from .services.staking import bet_profit, recommended_stake
 
 DEFAULT_SPORT = "basketball_nba"
 DISCLAIMER = "Informational only. Not financial advice. 18+. Please bet responsibly."
@@ -133,3 +134,66 @@ class SavedBetViewSet(viewsets.ModelViewSet):
         )
         out = self.get_serializer(obj)
         return Response(out.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
+
+
+class TrackedBetViewSet(viewsets.ModelViewSet):
+    """A user's logged bets, for bankroll tracking (auth required)."""
+
+    serializer_class = TrackedBetSerializer
+    permission_classes = [IsAuthenticated]
+    http_method_names = ["get", "post", "patch", "delete"]
+
+    def get_queryset(self):
+        return TrackedBet.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer) -> None:
+        serializer.save(user=self.request.user)
+
+    def perform_update(self, serializer) -> None:
+        # Stamp settlement time when a bet moves out of "pending".
+        instance = serializer.save()
+        if instance.status != TrackedBet.Status.PENDING and instance.settled_at is None:
+            instance.settled_at = timezone.now()
+            instance.save(update_fields=["settled_at"])
+
+
+class BankrollStatsView(APIView):
+    """Real bankroll analytics computed from the user's settled bets."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request) -> Response:
+        bets = list(TrackedBet.objects.filter(user=request.user).order_by("placed_at"))
+        settled = [b for b in bets if b.status in ("won", "lost", "push")]
+        wins = sum(1 for b in settled if b.status == "won")
+        losses = sum(1 for b in settled if b.status == "lost")
+        pushes = sum(1 for b in settled if b.status == "push")
+        staked = sum((b.stake for b in settled), Decimal("0"))
+        profit = sum((bet_profit(b.status, b.american_odds, b.stake) for b in settled), Decimal("0"))
+        roi = (profit / staked * 100) if staked else Decimal("0")
+        decided = wins + losses
+        win_rate = (Decimal(wins) / Decimal(decided) * 100) if decided else Decimal("0")
+
+        # Cumulative-profit growth series (one point per settled bet, in order).
+        running = Decimal("0")
+        growth = []
+        for b in settled:
+            running += bet_profit(b.status, b.american_odds, b.stake)
+            growth.append({
+                "at": (b.settled_at or b.placed_at).isoformat(),
+                "cumulative_profit": str(running.quantize(Decimal("0.01"))),
+            })
+
+        pending = [b for b in bets if b.status == "pending"]
+        return Response({
+            "record": f"{wins}-{losses}-{pushes}",
+            "wins": wins, "losses": losses, "pushes": pushes,
+            "total_staked": str(staked.quantize(Decimal("0.01"))),
+            "total_profit": str(profit.quantize(Decimal("0.01"))),
+            "roi_pct": str(roi.quantize(Decimal("0.01"))),
+            "win_rate_pct": str(win_rate.quantize(Decimal("0.01"))),
+            "settled_count": len(settled),
+            "pending_count": len(pending),
+            "pending_stake": str(sum((b.stake for b in pending), Decimal("0")).quantize(Decimal("0.01"))),
+            "growth": growth,
+        })

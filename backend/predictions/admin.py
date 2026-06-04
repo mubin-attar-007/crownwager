@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from django.contrib import admin
 
-from .models import BestBet, Game, ModelPrediction, SavedBet
+from .models import BestBet, Game, ModelPrediction, SavedBet, TrackedBet
 
 
 class ModelPredictionInline(admin.TabularInline):
@@ -29,4 +29,11 @@ class BestBetAdmin(admin.ModelAdmin):
 class SavedBetAdmin(admin.ModelAdmin):
     list_display = ["user", "selection", "market", "american_odds", "edge_pct", "saved_at"]
     list_filter = ["market", "sport_key"]
+    search_fields = ["user__username", "selection"]
+
+
+@admin.register(TrackedBet)
+class TrackedBetAdmin(admin.ModelAdmin):
+    list_display = ["user", "selection", "american_odds", "stake", "status", "placed_at"]
+    list_filter = ["status", "market", "sport_key"]
     search_fields = ["user__username", "selection"]

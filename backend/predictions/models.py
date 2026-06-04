@@ -120,3 +120,34 @@ class SavedBet(models.Model):
 
     def __str__(self) -> str:
         return f"{self.user.username} · {self.selection} ({self.edge_pct}%)"
+
+
+class TrackedBet(models.Model):
+    """A bet the user logged, for bankroll tracking (ROI, P/L, win rate). Real, user-entered data."""
+
+    class Status(models.TextChoices):
+        PENDING = "pending", "Pending"
+        WON = "won", "Won"
+        LOST = "lost", "Lost"
+        PUSH = "push", "Push"
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="tracked_bets")
+    external_id = models.CharField(max_length=120, blank=True)
+    sport_key = models.CharField(max_length=40, default="basketball_nba")
+    home_team = models.CharField(max_length=80, blank=True)
+    away_team = models.CharField(max_length=80, blank=True)
+    market = models.CharField(max_length=20, default="moneyline")
+    selection = models.CharField(max_length=80)
+    bookmaker = models.CharField(max_length=80, blank=True)
+    american_odds = models.IntegerField()
+    stake = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(max_length=10, choices=Status.choices, default=Status.PENDING)
+    placed_at = models.DateTimeField(auto_now_add=True)
+    settled_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-placed_at"]
+        indexes = [models.Index(fields=["user", "status"])]
+
+    def __str__(self) -> str:
+        return f"{self.user.username} · {self.selection} @ {self.american_odds} ({self.status})"

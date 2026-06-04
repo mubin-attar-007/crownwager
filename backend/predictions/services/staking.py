@@ -61,3 +61,13 @@ def recommended_stake(win_prob: Any, american_odds: Any, bankroll: Any, fraction
     """Concrete stake = bankroll × fractional-Kelly fraction."""
     k = kelly_fraction(win_prob, american_odds, fraction)
     return (_d(bankroll) * k).quantize(CENT, rounding=ROUND_HALF_UP)
+
+
+def bet_profit(status: str, american_odds: Any, stake: Any) -> Decimal:
+    """Realized profit/loss for a settled bet (0 for pending/push)."""
+    s = _d(stake)
+    if status == "won":
+        return ((american_to_decimal(american_odds) - Decimal("1")) * s).quantize(CENT, ROUND_HALF_UP)
+    if status == "lost":
+        return (-s).quantize(CENT, ROUND_HALF_UP)
+    return Decimal("0.00")
