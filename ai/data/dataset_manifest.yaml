@@ -1,24 +1,24 @@
-# Dataset manifest — documents the inputs the models were/should be trained on.
-# Raw data is NOT committed to git (see .gitignore). The legacy SQLite datasets are archived under
-# _archived/legacy_oddsaway/nba_betting/Data/ for reference and can be registered here.
+# Dataset manifest — documents the data the model was trained on.
+# The legacy archive was removed after extraction; the two files needed to retrain are preserved
+# under ai/data/training/ (gitignored — they're data, not source). Raw/large data is never committed.
 
 datasets:
-  - name: nba_team_game_stats
-    source: stats.nba.com (leaguedashteamstats)
-    legacy_artifact: _archived/legacy_oddsaway/nba_betting/Data/TeamData.sqlite
-    reproducible: false
+  - name: nba_game_dataset
+    file: ai/data/training/dataset.sqlite        # table: dataset_2012-24_new (15,115 games, 115 cols)
+    origin: stats.nba.com team stats, assembled by the legacy pipeline
+    label: Home-Team-Win
+    used_by: ai/train/train_nba_ml.py
+    reproducible: partial
     notes: >
-      Per-team season stats used for feature engineering. Sourced live from the NBA stats API in the
-      legacy pipeline; not version-pinned, so the exact training set cannot be reproduced. Re-collect
-      and snapshot before retraining.
+      Per-game pre-game team season stats for both teams. This is the training matrix for the
+      validated XGBoost moneyline model (see ai/models/model_manifest.yaml). Sourced originally from
+      the NBA stats API (not version-pinned), so the exact set can't be perfectly re-derived; the
+      snapshot here is what the shipped model was trained + validated on.
 
   - name: historical_odds
-    source: sbrodds / sportsbookreview
-    legacy_artifact: _archived/legacy_oddsaway/nba_betting/Data/OddsData.sqlite
+    file: ai/data/training/OddsData.sqlite        # per-season tables: Date, Home, Away, ML_Home, ML_Away, Win_Margin…
+    origin: sportsbookreview historical odds
     reproducible: false
-
-  - name: nba_2024_schedule
-    source: fixturedownload.com
-    legacy_artifact: _archived/legacy_oddsaway/nba_betting/Data/nba-2024-UTC.csv
-    reproducible: true
-    notes: Static CSV of the 2024 schedule, used for days-rest features.
+    notes: >
+      Historical moneyline/spread/total odds + outcomes. Kept for a future ROI backtest of model
+      picks against closing lines (not yet wired into serving).
