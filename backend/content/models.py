@@ -19,6 +19,8 @@ class Article(models.Model):
     summary = models.CharField(max_length=400, blank=True)
     body = models.TextField(help_text="Markdown or HTML body.")
     cover_image = models.ImageField(upload_to="articles/", blank=True)
+    source = models.CharField(max_length=80, blank=True, help_text="e.g. ESPN, for ingested news.")
+    source_url = models.URLField(blank=True, help_text="Original article link, for ingested news.")
     is_published = models.BooleanField(default=False, db_index=True)
     published_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
