@@ -187,6 +187,7 @@ CELERY_BEAT_SCHEDULE = {
 ODDS_API_KEY = env.odds_api_key
 ODDS_API_BASE_URL = env.odds_api_base_url
 AI_SERVICE_URL = env.ai_service_url
+REFRESH_TOKEN = env.refresh_token
 ANTHROPIC_API_KEY = env.anthropic_api_key
 LLM_API_KEY = env.llm_api_key
 LLM_BASE_URL = env.llm_base_url

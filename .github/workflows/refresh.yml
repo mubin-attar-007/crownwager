@@ -1,0 +1,30 @@
+# Keeps live predictions + news fresh on a free host that has no always-on worker.
+# Enable by adding two repo secrets (Settings → Secrets → Actions):
+#   BACKEND_URL    e.g. https://oddsaway-backend.onrender.com
+#   REFRESH_TOKEN  the same value set on the backend's REFRESH_TOKEN env var
+name: Scheduled data refresh
+
+on:
+  schedule:
+    - cron: "0 */6 * * *" # every 6 hours (UTC)
+  workflow_dispatch: {}
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger backend refresh
+        run: |
+          if [ -z "${{ secrets.BACKEND_URL }}" ] || [ -z "${{ secrets.REFRESH_TOKEN }}" ]; then
+            echo "BACKEND_URL / REFRESH_TOKEN secrets not set — skipping."
+            exit 0
+          fi
+          # First request may wake a sleeping free host; retry once.
+          for i in 1 2; do
+            if curl -fsS -X POST "${{ secrets.BACKEND_URL }}/api/internal/refresh/" \
+                 -H "X-Refresh-Token: ${{ secrets.REFRESH_TOKEN }}" --max-time 120; then
+              echo "Refresh OK"; exit 0
+            fi
+            echo "Attempt $i failed (host may be waking up); retrying…"; sleep 30
+          done
+          echo "Refresh failed after retries"; exit 1
