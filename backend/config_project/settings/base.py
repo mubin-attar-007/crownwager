@@ -160,6 +160,10 @@ CELERY_BEAT_SCHEDULE = {
         "task": "predictions.tasks.refresh_all_predictions",
         "schedule": 1800.0,
     },
+    "refresh-news-every-3-hours": {
+        "task": "content.tasks.refresh_news",
+        "schedule": 3 * 3600.0,
+    },
 }
 
 # ── Project-specific (consumed by services) ────────────────────────

@@ -8,7 +8,7 @@ from .models import Article
 class ArticleListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
-        fields = ["id", "title", "slug", "category", "summary", "cover_image", "published_at"]
+        fields = ["id", "title", "slug", "category", "summary", "cover_image", "source", "published_at"]
 
 
 class ArticleDetailSerializer(serializers.ModelSerializer):
@@ -16,5 +16,5 @@ class ArticleDetailSerializer(serializers.ModelSerializer):
         model = Article
         fields = [
             "id", "title", "slug", "category", "summary", "body",
-            "cover_image", "published_at", "updated_at",
+            "cover_image", "source", "source_url", "published_at", "updated_at",
         ]
