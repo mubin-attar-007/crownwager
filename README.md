@@ -1,11 +1,11 @@
-# OddsAway — Data-Driven Sports Betting Analytics
+# CrownWager — Data-Driven Sports Betting Analytics
 
 A modern, full-stack sports-betting **analytics & predictions** platform (inspired by
 [dimers.com](https://www.dimers.com)): daily **+EV best bets**, **ML model predictions**, **live
 odds comparison**, **scores**, an **arbitrage finder**, **saved picks**, a multi-sport selector,
-and **OddsBot** — a Claude-powered assistant grounded in the current best bets.
+and **CrownBot** — a Claude-powered assistant grounded in the current best bets.
 
-> ℹ️ **Informational only.** OddsAway does not accept wagers, hold funds, or give financial advice.
+> ℹ️ **Informational only.** CrownWager does not accept wagers, hold funds, or give financial advice.
 > **18+. Please bet responsibly.**
 
 This repository is a ground-up rebuild of a legacy Django monolith that scored **2.3/10** in a
@@ -51,7 +51,7 @@ Then open:
 |---|---|
 | http://localhost:3000 | Frontend (best bets, predictions, odds, arbitrage, learn) |
 | http://localhost:8000/api/docs/ | API docs (Swagger / OpenAPI) |
-| http://localhost:8000/admin/ | Django admin — `admin@oddsaway.local` / `admin12345` |
+| http://localhost:8000/admin/ | Django admin — `admin@crownwager.local` / `admin12345` |
 | http://localhost:8001/health | AI service health |
 
 The stack runs in **demo mode** out of the box (no API key needed) using clearly-labelled sample
@@ -84,7 +84,7 @@ npm run dev                          # http://localhost:3000
 
 | Tier | Command | Coverage |
 |---|---|---|
-| Backend | `cd backend && pytest` | 35 tests: auth flow, arbitrage (Decimal), EV/Kelly, Odds API client (mocked), AI client, Celery persistence + DB-read, saved picks, OddsBot |
+| Backend | `cd backend && pytest` | 35 tests: auth flow, arbitrage (Decimal), EV/Kelly, Odds API client (mocked), AI client, Celery persistence + DB-read, saved picks, CrownBot |
 | AI | `pytest ai/tests` | 5 tests: features, engine, `/health`, `/predict` |
 | Frontend | `cd frontend && npm test` | format helpers (Vitest) |
 

@@ -27,10 +27,10 @@ seed:          ## Seed demo data (admin user, bookmakers, articles)
 test: test-backend test-ai test-frontend  ## Run all test suites
 
 test-backend:  ## Backend tests (Django + DRF)
-	docker run --rm -v "$(CURDIR)/backend:/app" oddsaway-backend:dev pytest -q
+	docker run --rm -v "$(CURDIR)/backend:/app" crownwager-backend:dev pytest -q
 
 test-ai:       ## AI service tests (FastAPI)
-	docker run --rm oddsaway-ai:dev sh -c "pip install -q pytest httpx && pytest ai/tests -q"
+	docker run --rm crownwager-ai:dev sh -c "pip install -q pytest httpx && pytest ai/tests -q"
 
 test-frontend: ## Frontend unit tests (Vitest)
 	docker run --rm -v "$(CURDIR)/frontend:/app" -v /app/node_modules -w /app node:22-alpine \

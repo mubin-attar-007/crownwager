@@ -32,7 +32,7 @@ class HealthView(APIView):
 
         payload = {
             "status": "ok" if db_ok else "degraded",
-            "service": "oddsaway-api",
+            "service": "crownwager-api",
             "version": "0.1.0",
             "checks": {"database": "ok" if db_ok else "error"},
         }

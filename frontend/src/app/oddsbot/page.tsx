@@ -16,10 +16,10 @@ const SUGGESTIONS = [
   "Which games have the biggest edges?",
 ];
 
-export default function OddsBotPage() {
+export default function CrownBotPage() {
   const { data } = useApi<BestBetsResponse>("/best-bets/?sport=basketball_nba");
   const [msgs, setMsgs] = useState<Msg[]>([
-    { role: "assistant", content: "Hi! I'm OddsBot. I can explain today's edges, predictions, and staking. Ask me anything." },
+    { role: "assistant", content: "Hi! I'm CrownBot. I can explain today's edges, predictions, and staking. Ask me anything." },
   ]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
@@ -48,7 +48,7 @@ export default function OddsBotPage() {
 
   return (
     <div>
-      <SectionHeading eyebrow="AI insights" title="OddsBot" subtitle="Ask about today's edges, predictions, and staking — grounded in live data." />
+      <SectionHeading eyebrow="AI insights" title="CrownBot" subtitle="Ask about today's edges, predictions, and staking — grounded in live data." />
       <div className="grid gap-4 lg:grid-cols-3">
         {/* Context: today's top edges */}
         <div className="card lg:col-span-1">
@@ -72,7 +72,7 @@ export default function OddsBotPage() {
         <div className="card flex h-[34rem] flex-col lg:col-span-2">
           <div className="mb-3 flex items-center gap-2 border-b border-white/[0.06] pb-3">
             <LogoMark size={22} />
-            <span className="font-bold text-white">OddsBot</span>
+            <span className="font-bold text-white">CrownBot</span>
             {poweredBy && <span className="chip ml-auto">{poweredBy}</span>}
             <span className="chip">informational</span>
           </div>
@@ -85,7 +85,7 @@ export default function OddsBotPage() {
                 </div>
               </div>
             ))}
-            {busy && <div className="flex items-center gap-2 text-xs text-slate-400"><Spinner /> OddsBot is thinking…</div>}
+            {busy && <div className="flex items-center gap-2 text-xs text-slate-400"><Spinner /> CrownBot is thinking…</div>}
             <div ref={endRef} />
           </div>
 
@@ -98,7 +98,7 @@ export default function OddsBotPage() {
           )}
 
           <form onSubmit={(e) => { e.preventDefault(); void ask(input); }} className="mt-2 flex gap-2 border-t border-white/[0.06] pt-3">
-            <input className="input" placeholder="Ask OddsBot…" value={input} onChange={(e) => setInput(e.target.value)} aria-label="Message OddsBot" />
+            <input className="input" placeholder="Ask CrownBot…" value={input} onChange={(e) => setInput(e.target.value)} aria-label="Message CrownBot" />
             <button className="btn-primary" disabled={busy}>Send</button>
           </form>
         </div>

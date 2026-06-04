@@ -3,7 +3,7 @@
 # Secrets (sync:false) are set in the Render dashboard, never committed.
 services:
   - type: web
-    name: oddsaway-ai
+    name: crownwager-ai
     runtime: docker
     dockerfilePath: ./infrastructure/docker/Dockerfile.ai
     dockerContext: .
@@ -16,7 +16,7 @@ services:
         value: "8001"
 
   - type: web
-    name: oddsaway-backend
+    name: crownwager-backend
     runtime: docker
     dockerfilePath: ./infrastructure/docker/Dockerfile.backend
     dockerContext: .
@@ -42,13 +42,13 @@ services:
         value: gemini-2.5-flash
       - key: AI_SERVICE_URL            # internal URL of the AI service above
         fromService:
-          name: oddsaway-ai
+          name: crownwager-ai
           type: web
           property: hostport
       # ── Set these in the Render dashboard (sync:false = not in git) ──
-      - key: ALLOWED_HOSTS            # e.g. oddsaway-backend.onrender.com
+      - key: ALLOWED_HOSTS            # e.g. crownwager-backend.onrender.com
         sync: false
-      - key: CORS_ALLOWED_ORIGINS     # e.g. https://oddsaway.vercel.app
+      - key: CORS_ALLOWED_ORIGINS     # e.g. https://crownwager.vercel.app
         sync: false
       - key: DATABASE_URL             # from Neon
         sync: false

@@ -1,7 +1,7 @@
 [project]
-name = "oddsaway-backend"
+name = "crownwager-backend"
 version = "0.1.0"
-description = "OddsAway — sports-betting analytics & predictions API (Django + DRF)"
+description = "CrownWager — sports-betting analytics & predictions API (Django + DRF)"
 requires-python = ">=3.12"
 dependencies = [
     "Django>=5.1,<5.2",

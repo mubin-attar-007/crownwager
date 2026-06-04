@@ -13,7 +13,7 @@ The legacy project shipped pre-trained NN (Keras SavedModel) and XGBoost (JSON) 
 **unverified** accuracy claims (e.g. "68%"), timestamp-only provenance, no checksums, and training data
 sourced live from external APIs (so the exact training set can't be reproduced). The assessment flagged
 these as *unknown commercial value pending validation*. They are preserved under
-`_archived/legacy_oddsaway/nba_betting/Models/`.
+`_archived/legacy_crownwager/nba_betting/Models/`.
 
 ## Promoting a validated model
 

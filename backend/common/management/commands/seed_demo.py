@@ -45,11 +45,11 @@ class Command(BaseCommand):
     help = "Seed demo data (admin user, bookmakers, articles)."
 
     def handle(self, *args, **options) -> None:
-        if not User.objects.filter(username="admin@oddsaway.local").exists():
+        if not User.objects.filter(username="admin@crownwager.local").exists():
             User.objects.create_superuser(
-                username="admin@oddsaway.local", email="admin@oddsaway.local", password="admin12345"
+                username="admin@crownwager.local", email="admin@crownwager.local", password="admin12345"
             )
-            self.stdout.write(self.style.SUCCESS("Created admin user admin@oddsaway.local / admin12345"))
+            self.stdout.write(self.style.SUCCESS("Created admin user admin@crownwager.local / admin12345"))
 
         for key, title, url in BOOKMAKERS:
             Bookmaker.objects.get_or_create(key=key, defaults={"title": title, "url": url})

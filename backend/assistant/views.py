@@ -1,4 +1,4 @@
-"""OddsBot chat endpoint."""
+"""CrownBot chat endpoint."""
 from __future__ import annotations
 
 from drf_spectacular.utils import extend_schema
@@ -25,7 +25,7 @@ class ChatRequestSerializer(serializers.Serializer):
 
 class ChatView(APIView):
     # LLM-backed: strictly throttled (10/min, see DEFAULT_THROTTLE_RATES['assistant'])
-    # to prevent cost/quota abuse of the OddsBot endpoint.
+    # to prevent cost/quota abuse of the CrownBot endpoint.
     permission_classes = [AllowAny]
     throttle_classes = [ScopedRateThrottle]
     throttle_scope = "assistant"
@@ -33,7 +33,7 @@ class ChatView(APIView):
     @extend_schema(
         request=ChatRequestSerializer,
         responses={200: dict},
-        description="Ask OddsBot about the current best bets or betting concepts. "
+        description="Ask CrownBot about the current best bets or betting concepts. "
         "Uses Claude when configured; otherwise returns a deterministic data summary.",
     )
     def post(self, request: Request) -> Response:

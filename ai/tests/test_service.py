@@ -39,7 +39,7 @@ def test_predict_matches_offered_selection() -> None:
 def test_health_endpoint() -> None:
     resp = client.get("/health")
     assert resp.status_code == 200
-    assert resp.json()["service"] == "oddsaway-ai"
+    assert resp.json()["service"] == "crownwager-ai"
 
 
 def test_predict_endpoint() -> None:

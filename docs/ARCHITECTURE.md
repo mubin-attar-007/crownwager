@@ -2,7 +2,7 @@
 
 ## Why a rebuild (assessment summary)
 
-A 17-agent assessment of the legacy `oddsaway` Django monolith scored it **2.3/10** and recommended a
+A 17-agent assessment of the legacy `crownwager` Django monolith scored it **2.3/10** and recommended a
 **full rebuild**. Headline issues: secrets committed to the repo, a profile view that 500'd for
 anonymous users, no `SECURE_*` headers, heavy ML training/inference inside the web process, a dead
 `nfl_betting` app, ~1.1 GB of bloat checked in (venv + a 498 MB `.rar`), a UTF-16 `requirements.txt`

@@ -1,11 +1,11 @@
 # Responsible Gambling & Scope
 
-## What OddsAway is
+## What CrownWager is
 
-OddsAway is an **informational analytics tool**. It surfaces model predictions, expected-value
+CrownWager is an **informational analytics tool**. It surfaces model predictions, expected-value
 estimates, odds comparisons, and arbitrage calculations for educational and entertainment purposes.
 
-## What OddsAway is NOT
+## What CrownWager is NOT
 
 - It is **not** a sportsbook. It does not accept, place, or settle wagers.
 - It does **not** hold, transfer, or process money. There is no wallet, deposit, or payout.

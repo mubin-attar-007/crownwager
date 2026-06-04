@@ -68,7 +68,7 @@ export default function DashboardPage() {
         {/* Side column */}
         <div className="space-y-4">
           <Link href="/oddsbot" className="card card-hover block">
-            <div className="flex items-center gap-2 text-brand-300"><Icon name="spark" size={18} /><span className="font-bold">Ask OddsBot</span></div>
+            <div className="flex items-center gap-2 text-brand-300"><Icon name="spark" size={18} /><span className="font-bold">Ask CrownBot</span></div>
             <p className="mt-2 text-sm text-slate-400">&ldquo;What&apos;s the best edge today?&rdquo; — get AI insight on your picks.</p>
           </Link>
 

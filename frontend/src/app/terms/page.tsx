@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Terms of Service",
-  description: "OddsAway terms of service — an informational sports-analytics tool. 18+.",
+  description: "CrownWager terms of service — an informational sports-analytics tool. 18+.",
 };
 
 export default function TermsPage() {
@@ -12,17 +12,17 @@ export default function TermsPage() {
       <h1 className="text-3xl font-extrabold text-white">Terms of Service</h1>
       <p className="text-sm text-slate-500">Last updated: June 2026</p>
 
-      <h2>1. What OddsAway is</h2>
+      <h2>1. What CrownWager is</h2>
       <p>
-        OddsAway is an <strong>informational sports-analytics tool</strong>. It provides model
+        CrownWager is an <strong>informational sports-analytics tool</strong>. It provides model
         predictions, odds comparisons, expected-value estimates, and arbitrage calculations for
-        educational and entertainment purposes only. OddsAway is <strong>not a sportsbook</strong>: it
+        educational and entertainment purposes only. CrownWager is <strong>not a sportsbook</strong>: it
         does not accept, place, or settle wagers, and it never holds or transfers money.
       </p>
 
       <h2>2. Not advice; no guarantees</h2>
       <p>
-        Nothing on OddsAway is financial, investment, or betting advice. Model outputs are estimates
+        Nothing on CrownWager is financial, investment, or betting advice. Model outputs are estimates
         and may be wrong; odds change; past performance does not predict future results. You are solely
         responsible for any decisions you make. We make no warranty of accuracy, availability, or fitness
         for any purpose, and provide the service &ldquo;as is&rdquo; to the maximum extent permitted by law.
@@ -31,7 +31,7 @@ export default function TermsPage() {
       <h2>3. Age &amp; eligibility</h2>
       <p>
         You must be at least <strong>18 years old</strong> (or the age of majority in your jurisdiction,
-        whichever is higher) to use OddsAway. Sports-betting laws vary by location; it is your
+        whichever is higher) to use CrownWager. Sports-betting laws vary by location; it is your
         responsibility to ensure your use is legal where you are.
       </p>
 

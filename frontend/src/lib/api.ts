@@ -1,8 +1,8 @@
 // Tiny typed API client. Stores the JWT access token in localStorage and attaches it to requests.
 
 const BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000/api";
-const TOKEN_KEY = "oddsaway_access";
-const REFRESH_KEY = "oddsaway_refresh";
+const TOKEN_KEY = "crownwager_access";
+const REFRESH_KEY = "crownwager_refresh";
 
 export function getToken(): string | null {
   if (typeof window === "undefined") return null;

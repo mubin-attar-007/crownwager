@@ -40,21 +40,21 @@ before going public. They only ever live in env vars / dashboards — never in g
 ### 3. Backend + AI — Render (via the blueprint)
 1. Push this repo to GitHub.
 2. At [render.com](https://render.com) → **New → Blueprint** → pick your repo. Render reads `render.yaml`
-   and creates **oddsaway-backend** + **oddsaway-ai**.
-3. In the **oddsaway-backend** service → Environment, set the `sync:false` vars:
+   and creates **crownwager-backend** + **crownwager-ai**.
+3. In the **crownwager-backend** service → Environment, set the `sync:false` vars:
    - `DATABASE_URL` = Neon string
    - `REDIS_URL` = Upstash string
    - `ODDS_API_KEY` = your (rotated) Odds API key
    - `LLM_API_KEY` = your (rotated) Gemini key
-   - `ALLOWED_HOSTS` = `oddsaway-backend.onrender.com` (your backend domain)
-   - `CORS_ALLOWED_ORIGINS` = your Vercel URL (set after step 4, e.g. `https://oddsaway.vercel.app`)
+   - `ALLOWED_HOSTS` = `crownwager-backend.onrender.com` (your backend domain)
+   - `CORS_ALLOWED_ORIGINS` = your Vercel URL (set after step 4, e.g. `https://crownwager.vercel.app`)
    - `ADMIN_URL` = a hard-to-guess path, e.g. `ops-7f3a9c/`
 4. Deploy. The backend runs migrations + collectstatic on boot. Check `…onrender.com/api/health/`.
 
 ### 4. Frontend — Vercel
 1. At [vercel.com](https://vercel.com) → **New Project** → import the repo → set **Root Directory** to
    `frontend`.
-2. Add env var `NEXT_PUBLIC_API_BASE_URL` = `https://oddsaway-backend.onrender.com/api`.
+2. Add env var `NEXT_PUBLIC_API_BASE_URL` = `https://crownwager-backend.onrender.com/api`.
 3. Deploy → you get `https://<project>.vercel.app`. Put that into the backend's `CORS_ALLOWED_ORIGINS`
    (and `ALLOWED_HOSTS` if you add a custom domain), then redeploy the backend.
 

@@ -13,9 +13,9 @@ from .prediction_engine import DISCLAIMER, predict_games
 from .schemas import PredictRequest, PredictResponse
 
 app = FastAPI(
-    title="OddsAway AI Service",
+    title="CrownWager AI Service",
     version="0.1.0",
-    description="Decoupled ML prediction service for OddsAway. Informational only; 18+.",
+    description="Decoupled ML prediction service for CrownWager. Informational only; 18+.",
 )
 
 
@@ -24,7 +24,7 @@ def health() -> dict:
     model = active_model()
     return {
         "status": "ok",
-        "service": "oddsaway-ai",
+        "service": "crownwager-ai",
         "model": {"name": model.name, "version": model.version, "validated": model.validated},
     }
 

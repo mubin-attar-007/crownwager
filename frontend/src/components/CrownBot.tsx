@@ -11,10 +11,10 @@ interface Msg {
   content: string;
 }
 
-export default function OddsBot() {
+export default function CrownBot() {
   const [open, setOpen] = useState(false);
   const [msgs, setMsgs] = useState<Msg[]>([
-    { role: "assistant", content: "Hi! I'm OddsBot. Ask me about today's best bets or any betting concept." },
+    { role: "assistant", content: "Hi! I'm CrownBot. Ask me about today's best bets or any betting concept." },
   ]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
@@ -52,17 +52,17 @@ export default function OddsBot() {
     <>
       <button
         onClick={() => setOpen((o) => !o)}
-        aria-label="Open OddsBot assistant"
+        aria-label="Open CrownBot assistant"
         className="group fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-full bg-brand-gradient px-5 py-3 font-bold text-ink-950 shadow-glow transition hover:brightness-110"
       >
-        {open ? "✕ Close" : <><LogoMark size={20} /> OddsBot</>}
+        {open ? "✕ Close" : <><LogoMark size={20} /> CrownBot</>}
       </button>
 
       {open && (
         <div className="fixed bottom-20 right-5 z-50 flex h-[30rem] w-[23rem] max-w-[92vw] flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-ink-850/95 shadow-lift backdrop-blur-xl">
           <div className="flex items-center gap-2 border-b border-white/[0.06] px-4 py-3">
             <LogoMark size={22} />
-            <div className="text-sm font-bold text-white">OddsBot</div>
+            <div className="text-sm font-bold text-white">CrownBot</div>
             <span className="ml-auto chip">informational</span>
           </div>
           <div className="flex-1 space-y-3 overflow-y-auto p-3">
@@ -81,7 +81,7 @@ export default function OddsBot() {
             ))}
             {busy && (
               <div className="flex items-center gap-2 text-xs text-slate-400">
-                <Spinner /> OddsBot is thinking…
+                <Spinner /> CrownBot is thinking…
               </div>
             )}
             <div ref={endRef} />
@@ -98,7 +98,7 @@ export default function OddsBot() {
               placeholder="Ask about today's edges…"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              aria-label="Message OddsBot"
+              aria-label="Message CrownBot"
             />
             <button className="btn-primary" disabled={busy} aria-label="Send">
               ➤
