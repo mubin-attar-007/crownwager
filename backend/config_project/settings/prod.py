@@ -25,7 +25,7 @@ if not _cors or any(("localhost" in o or "*" in o) for o in _cors):
     )
 
 # ── HTTPS / transport security (assumes TLS terminated at the edge) ─
-SECURE_SSL_REDIRECT = True
+SECURE_SSL_REDIRECT = env.secure_ssl_redirect
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SECURE_HSTS_SECONDS = 31_536_000  # 1 year
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True

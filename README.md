@@ -1,3 +1,14 @@
+<!-- The block below configures the Hugging Face Space (Docker). It is harmless on GitHub. -->
+---
+title: CrownWager
+emoji: 👑
+colorFrom: green
+colorTo: indigo
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # CrownWager — Data-Driven Sports Betting Analytics
 
 A modern, full-stack sports-betting **analytics & predictions** platform (inspired by
