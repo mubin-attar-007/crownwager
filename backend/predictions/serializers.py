@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from rest_framework import serializers
 
-from .models import BestBet, Game, ModelPrediction, SavedBet
+from .models import BestBet, Game, ModelPrediction, SavedBet, TrackedBet
+from .services.staking import bet_profit
 
 
 class ModelPredictionSerializer(serializers.ModelSerializer):
@@ -37,6 +38,21 @@ class SavedBetSerializer(serializers.ModelSerializer):
             "model_probability", "edge_pct", "expected_value", "saved_at",
         ]
         read_only_fields = ["id", "saved_at"]
+
+
+class TrackedBetSerializer(serializers.ModelSerializer):
+    profit = serializers.SerializerMethodField()
+
+    class Meta:
+        model = TrackedBet
+        fields = [
+            "id", "external_id", "sport_key", "home_team", "away_team", "market", "selection",
+            "bookmaker", "american_odds", "stake", "status", "profit", "placed_at", "settled_at",
+        ]
+        read_only_fields = ["id", "profit", "placed_at", "settled_at"]
+
+    def get_profit(self, obj) -> str:
+        return str(bet_profit(obj.status, obj.american_odds, obj.stake))
 
 
 def bestbet_to_dict(bb) -> dict:

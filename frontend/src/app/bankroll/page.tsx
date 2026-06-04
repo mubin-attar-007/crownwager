@@ -1,108 +1,191 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth";
 import { api, ApiError } from "@/lib/api";
 import { Empty, Loading, SectionHeading, StatTile } from "@/components/ui";
+import { fmtOdds } from "@/lib/format";
+import type { BankrollStats, BetStatus, TrackedBet } from "@/lib/types";
 
-// Decorative preview area-chart (roadmap visual until real bet-tracking exists).
-function PreviewArea() {
+function ProfitChart({ points }: { points: { at: string; cumulative_profit: string }[] }) {
+  if (points.length < 2) {
+    return <div className="grid h-28 place-items-center text-sm text-slate-500">Settle 2+ bets to see your P/L curve.</div>;
+  }
+  const ys = points.map((p) => parseFloat(p.cumulative_profit));
+  const min = Math.min(0, ...ys);
+  const max = Math.max(0, ...ys);
+  const range = max - min || 1;
+  const W = 300, H = 90;
+  const coords = ys.map((y, i) => {
+    const x = (i / (ys.length - 1)) * W;
+    const yy = H - ((y - min) / range) * H;
+    return [x, yy];
+  });
+  const path = coords.map(([x, y], i) => `${i === 0 ? "M" : "L"}${x.toFixed(1)} ${y.toFixed(1)}`).join(" ");
+  const last = ys[ys.length - 1];
+  const stroke = last >= 0 ? "#34d399" : "#fb7185";
+  const zeroY = H - ((0 - min) / range) * H;
   return (
-    <svg viewBox="0 0 300 90" className="h-24 w-full" preserveAspectRatio="none" aria-hidden>
-      <defs>
-        <linearGradient id="bk" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#34d399" stopOpacity="0.35" />
-          <stop offset="1" stopColor="#34d399" stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      <path d="M0 70 C40 60 60 40 90 45 S150 20 180 30 240 10 300 18 L300 90 L0 90 Z" fill="url(#bk)" />
-      <path d="M0 70 C40 60 60 40 90 45 S150 20 180 30 240 10 300 18" fill="none" stroke="#34d399" strokeWidth="2" />
+    <svg viewBox={`0 0 ${W} ${H}`} className="h-28 w-full" preserveAspectRatio="none" aria-hidden>
+      <line x1="0" y1={zeroY} x2={W} y2={zeroY} stroke="#ffffff14" strokeDasharray="3 3" />
+      <path d={`${path} L${W} ${H} L0 ${H} Z`} fill={stroke} fillOpacity="0.12" />
+      <path d={path} fill="none" stroke={stroke} strokeWidth="2" />
     </svg>
   );
 }
+
+const EMPTY_FORM = { selection: "", market: "moneyline", american_odds: "", stake: "" };
 
 export default function BankrollPage() {
   const { user, loading, refreshUser } = useAuth();
   const [bankroll, setBankroll] = useState("1000.00");
   const [kelly, setKelly] = useState("0.50");
+  const [stats, setStats] = useState<BankrollStats | null>(null);
+  const [bets, setBets] = useState<TrackedBet[]>([]);
+  const [form, setForm] = useState(EMPTY_FORM);
   const [msg, setMsg] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
+
+  const load = useCallback(async () => {
+    if (!user) return;
+    const [s, b] = await Promise.all([
+      api.get<BankrollStats>("/bankroll/stats/"),
+      api.get<{ results: TrackedBet[] }>("/tracked-bets/"),
+    ]);
+    setStats(s);
+    setBets(b.results);
+  }, [user]);
 
   useEffect(() => {
     if (user) {
       setBankroll(user.profile.bankroll);
       setKelly(user.profile.kelly_fraction);
+      void load();
     }
-  }, [user]);
+  }, [user, load]);
 
-  async function save(e: React.FormEvent) {
+  async function saveSettings(e: React.FormEvent) {
     e.preventDefault();
-    setBusy(true);
     setMsg(null);
     try {
       await api.patch("/auth/me/", { profile: { bankroll, kelly_fraction: kelly } });
       await refreshUser();
-      setMsg("Saved.");
+      setMsg("Settings saved.");
     } catch (e) {
       setMsg(e instanceof ApiError ? e.message : "Could not save.");
-    } finally {
-      setBusy(false);
     }
   }
 
+  async function logBet(e: React.FormEvent) {
+    e.preventDefault();
+    try {
+      await api.post("/tracked-bets/", {
+        selection: form.selection, market: form.market,
+        american_odds: parseInt(form.american_odds, 10), stake: form.stake,
+      });
+      setForm(EMPTY_FORM);
+      await load();
+    } catch {
+      setMsg("Could not log bet — check the odds (e.g. -110) and stake.");
+    }
+  }
+
+  async function settle(id: number, status: BetStatus) {
+    await api.patch(`/tracked-bets/${id}/`, { status });
+    await load();
+  }
+  async function remove(id: number) {
+    await api.del(`/tracked-bets/${id}/`);
+    await load();
+  }
+
   if (loading) return <Loading />;
+  if (!user) {
+    return (
+      <div>
+        <SectionHeading eyebrow="Money management" title="Bankroll" />
+        <Empty label="Log in to track your bets, ROI and bankroll." />
+        <Link href="/login" className="btn-primary mt-3 inline-flex">Log in</Link>
+      </div>
+    );
+  }
+
+  const profitNum = stats ? parseFloat(stats.total_profit) : 0;
 
   return (
     <div>
-      <SectionHeading eyebrow="Money management" title="Bankroll" subtitle="Size stakes to your bankroll with the Kelly criterion." />
+      <SectionHeading eyebrow="Money management" title="Bankroll" subtitle="Track every bet to get real ROI, P/L and win rate." />
 
       <div className="mb-4 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatTile label="Bankroll" value={`$${user?.profile.bankroll ?? bankroll}`} />
-        <StatTile label="Kelly fraction" value={`${(parseFloat(user?.profile.kelly_fraction ?? kelly) * 100).toFixed(0)}%`} sub="variance control" />
-        <StatTile label="ROI" value="—" sub="Pro · soon" />
-        <StatTile label="Win rate" value="—" sub="Pro · soon" />
+        <StatTile label="ROI" value={stats ? `${stats.roi_pct}%` : "—"} sub={`${stats?.settled_count ?? 0} settled`} />
+        <StatTile label="Profit / Loss" value={<span className={profitNum >= 0 ? "text-pos" : "text-neg"}>${stats?.total_profit ?? "0.00"}</span>} />
+        <StatTile label="Win rate" value={stats ? `${stats.win_rate_pct}%` : "—"} sub={stats ? `record ${stats.record}` : ""} />
+        <StatTile label="Pending" value={stats?.pending_count ?? 0} sub={`$${stats?.pending_stake ?? "0.00"} at risk`} />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
-        {/* Settings */}
-        <div className="card lg:col-span-1">
-          <h3 className="mb-3 font-bold text-white">Settings</h3>
-          {user ? (
-            <form onSubmit={save} className="space-y-4">
-              <div>
-                <label className="label">Bankroll ($)</label>
-                <input className="input" value={bankroll} inputMode="decimal" onChange={(e) => setBankroll(e.target.value)} />
-              </div>
-              <div>
-                <label className="label">Kelly fraction (0–1)</label>
-                <input className="input" value={kelly} inputMode="decimal" onChange={(e) => setKelly(e.target.value)} />
-                <p className="mt-1 text-xs text-slate-500">0.5 = half-Kelly (recommended).</p>
-              </div>
-              <button className="btn-primary w-full" disabled={busy}>{busy ? "Saving…" : "Save"}</button>
-              {msg && <p className="text-center text-sm text-brand-300">{msg}</p>}
-            </form>
-          ) : (
+        {/* Left: settings + log bet */}
+        <div className="space-y-4 lg:col-span-1">
+          <form onSubmit={saveSettings} className="card space-y-3">
+            <h3 className="font-bold text-white">Settings</h3>
             <div>
-              <Empty label="Log in to set your bankroll and Kelly fraction." />
-              <Link href="/login" className="btn-primary mt-3 inline-flex">Log in</Link>
+              <label className="label">Bankroll ($)</label>
+              <input className="input" value={bankroll} inputMode="decimal" onChange={(e) => setBankroll(e.target.value)} />
             </div>
-          )}
+            <div>
+              <label className="label">Kelly fraction</label>
+              <input className="input" value={kelly} inputMode="decimal" onChange={(e) => setKelly(e.target.value)} />
+            </div>
+            <button className="btn-ghost w-full text-sm">Save settings</button>
+            {msg && <p className="text-center text-xs text-brand-300">{msg}</p>}
+          </form>
+
+          <form onSubmit={logBet} className="card space-y-3">
+            <h3 className="font-bold text-white">Log a bet</h3>
+            <input className="input" placeholder="Selection (e.g. Lakers ML)" value={form.selection} onChange={(e) => setForm({ ...form, selection: e.target.value })} required />
+            <div className="grid grid-cols-2 gap-2">
+              <input className="input" placeholder="Odds (-110)" value={form.american_odds} onChange={(e) => setForm({ ...form, american_odds: e.target.value })} required />
+              <input className="input" placeholder="Stake ($)" value={form.stake} inputMode="decimal" onChange={(e) => setForm({ ...form, stake: e.target.value })} required />
+            </div>
+            <button className="btn-primary w-full text-sm">Add bet</button>
+          </form>
         </div>
 
-        {/* Roadmap analytics */}
+        {/* Right: chart + history */}
         <div className="space-y-4 lg:col-span-2">
           <div className="card">
-            <div className="mb-2 flex items-center justify-between">
+            <div className="mb-1 flex items-center justify-between">
               <h3 className="font-bold text-white">Cumulative P/L</h3>
-              <span className="chip">Pro · preview</span>
+              <span className={`text-sm font-bold ${profitNum >= 0 ? "text-pos" : "text-neg"}`}>${stats?.total_profit ?? "0.00"}</span>
             </div>
-            <PreviewArea />
-            <p className="mt-2 text-xs text-slate-500">Track every settled pick to unlock real ROI, P/L, drawdowns and CLV. Coming next.</p>
+            <ProfitChart points={stats?.growth ?? []} />
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="card"><h3 className="font-bold text-white">Bankroll growth</h3><div className="mt-2"><PreviewArea /></div></div>
-            <div className="card"><h3 className="font-bold text-white">CLV tracking</h3><div className="mt-2"><PreviewArea /></div></div>
+
+          <div className="card">
+            <h3 className="mb-3 font-bold text-white">Bet history</h3>
+            {bets.length === 0 && <Empty label="No bets yet — log one on the left." />}
+            <div className="divide-y divide-white/[0.06]">
+              {bets.map((b) => (
+                <div key={b.id} className="flex flex-wrap items-center justify-between gap-2 py-3">
+                  <div className="min-w-0">
+                    <div className="font-semibold text-white">{b.selection} <span className="text-xs text-slate-500">{fmtOdds(b.american_odds)} · ${b.stake}</span></div>
+                    <div className="text-xs text-slate-500">
+                      {b.status === "pending" ? "pending" : `${b.status} · P/L $${b.profit}`}
+                    </div>
+                  </div>
+                  {b.status === "pending" ? (
+                    <div className="flex gap-1">
+                      <button onClick={() => settle(b.id, "won")} className="chip hover:text-pos">Won</button>
+                      <button onClick={() => settle(b.id, "lost")} className="chip hover:text-neg">Lost</button>
+                      <button onClick={() => settle(b.id, "push")} className="chip">Push</button>
+                    </div>
+                  ) : (
+                    <span className={`badge ${b.status === "won" ? "bg-pos/15 text-pos" : b.status === "lost" ? "bg-neg/15 text-neg" : "bg-white/[0.06] text-slate-400"}`}>{b.status}</span>
+                  )}
+                  <button onClick={() => remove(b.id)} className="text-xs text-slate-500 hover:text-neg">remove</button>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
