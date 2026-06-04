@@ -41,6 +41,8 @@ class Settings(BaseSettings):
     odds_api_key: str = ""
     odds_api_base_url: str = "https://api.the-odds-api.com/v4"
     ai_service_url: str = "http://localhost:8001"
+    # Shared secret for the scheduled-refresh endpoint (blank = endpoint disabled).
+    refresh_token: str = ""
 
     # ── Email (optional) ───────────────────────────────────────────
     email_host: str = "smtp.gmail.com"
