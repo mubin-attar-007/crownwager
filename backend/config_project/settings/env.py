@@ -26,6 +26,9 @@ class Settings(BaseSettings):
     admin_url: str = "admin/"
     # Expose the OpenAPI docs (Swagger/Redoc). Keep false in production.
     enable_api_docs: bool = False
+    # Force HTTPS redirect in prod. Disable on platforms that terminate TLS at a proxy
+    # and route to the container over HTTP (e.g. Hugging Face Spaces) to avoid redirect loops.
+    secure_ssl_redirect: bool = True
 
     # ── Database / cache / broker ──────────────────────────────────
     # Defaults to SQLite + in-process cache so the API boots with zero external services

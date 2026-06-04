@@ -45,11 +45,22 @@ class Command(BaseCommand):
     help = "Seed demo data (admin user, bookmakers, articles)."
 
     def handle(self, *args, **options) -> None:
-        if not User.objects.filter(username="admin@crownwager.local").exists():
-            User.objects.create_superuser(
-                username="admin@crownwager.local", email="admin@crownwager.local", password="admin12345"
+        # Admin: in dev, a convenient default; in prod, ONLY from env secrets (never a known password).
+        import os
+
+        from django.conf import settings
+
+        email = os.getenv("DJANGO_SUPERUSER_EMAIL", "admin@crownwager.local")
+        password = os.getenv("DJANGO_SUPERUSER_PASSWORD") or ("admin12345" if settings.DEBUG else "")
+        if password and not User.objects.filter(username=email).exists():
+            User.objects.create_superuser(username=email, email=email, password=password)
+            self.stdout.write(self.style.SUCCESS(f"Created admin user {email}"))
+        elif not password:
+            self.stdout.write(
+                self.style.WARNING(
+                    "No admin created — set DJANGO_SUPERUSER_EMAIL + DJANGO_SUPERUSER_PASSWORD to create one."
+                )
             )
-            self.stdout.write(self.style.SUCCESS("Created admin user admin@crownwager.local / admin12345"))
 
         for key, title, url in BOOKMAKERS:
             Bookmaker.objects.get_or_create(key=key, defaults={"title": title, "url": url})
