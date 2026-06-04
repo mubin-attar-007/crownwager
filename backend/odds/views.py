@@ -15,13 +15,13 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from common.sports import DEFAULT_SPORT, clean_sport
+
 from .fixtures_demo import DEMO_ODDS, DEMO_SCORES
 from .models import Bookmaker
 from .serializers import BookmakerSerializer
 from .services.arbitrage import find_arbitrage
 from .services.odds_api import OddsAPIClient, OddsAPIError
-
-DEFAULT_SPORT = "basketball_nba"
 
 
 class BookmakerViewSet(viewsets.ReadOnlyModelViewSet):
@@ -41,7 +41,7 @@ class OddsView(APIView):
         description="Live odds across sportsbooks for a sport. Falls back to demo data.",
     )
     def get(self, request: Request) -> Response:
-        sport = request.query_params.get("sport", DEFAULT_SPORT)
+        sport = clean_sport(request.query_params.get("sport"))
         markets = request.query_params.get("markets", "h2h")
         demo = False
         try:
@@ -62,7 +62,7 @@ class ScoresView(APIView):
         description="Recent and live scores for a sport. Falls back to demo data.",
     )
     def get(self, request: Request) -> Response:
-        sport = request.query_params.get("sport", DEFAULT_SPORT)
+        sport = clean_sport(request.query_params.get("sport"))
         try:
             days_from = int(request.query_params.get("days_from", 3))
         except (TypeError, ValueError):
@@ -88,7 +88,7 @@ class ArbitrageView(APIView):
         description="Find arbitrage opportunities. Money math uses Decimal. Falls back to demo data.",
     )
     def get(self, request: Request) -> Response:
-        sport = request.query_params.get("sport", DEFAULT_SPORT)
+        sport = clean_sport(request.query_params.get("sport"))
         raw_size = request.query_params.get("bet_size", "100")
         try:
             bet_size = Decimal(raw_size)

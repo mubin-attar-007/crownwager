@@ -12,6 +12,7 @@ export default function RegisterPage() {
   const { register } = useAuth();
   const router = useRouter();
   const [form, setForm] = useState({ first_name: "", last_name: "", email: "", password: "" });
+  const [agreed, setAgreed] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -21,6 +22,10 @@ export default function RegisterPage() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!agreed) {
+      setError("You must confirm you are 18+ and agree to the Terms & Privacy Policy.");
+      return;
+    }
     setBusy(true);
     setError(null);
     try {
@@ -68,16 +73,28 @@ export default function RegisterPage() {
             minLength={8} required />
           <p className="mt-1.5 text-xs text-slate-500">At least 8 characters.</p>
         </div>
-        <button className="btn-primary w-full" disabled={busy}>
+        <label className="flex items-start gap-2 text-xs text-slate-400">
+          <input
+            type="checkbox"
+            checked={agreed}
+            onChange={(e) => setAgreed(e.target.checked)}
+            className="mt-0.5 accent-brand-500"
+            aria-label="Confirm you are 18+ and agree to the terms"
+          />
+          <span>
+            I am 18+ and agree to the{" "}
+            <Link href="/terms" className="text-brand-300">Terms</Link> and{" "}
+            <Link href="/privacy" className="text-brand-300">Privacy Policy</Link>. This tool is
+            informational only.
+          </span>
+        </label>
+        <button className="btn-primary w-full" disabled={busy || !agreed}>
           {busy ? <><Spinner /> Creating…</> : "Sign up"}
         </button>
         <p className="text-center text-sm text-slate-400">
           Already have an account? <Link href="/login" className="font-semibold text-brand-300">Log in</Link>
         </p>
       </form>
-      <p className="mt-3 text-center text-xs text-slate-500">
-        By signing up you confirm you are 18+ and agree this tool is informational only.
-      </p>
     </div>
   );
 }

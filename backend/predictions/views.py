@@ -17,13 +17,14 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from common.sports import DEFAULT_SPORT, clean_sport
+
 from .models import BestBet, Game, SavedBet, TrackedBet
 from .serializers import GameSerializer, SavedBetSerializer, TrackedBetSerializer, bestbet_to_dict
 from .services.best_bets import compute_best_bets
 from .services.pipeline import gather_predictions
 from .services.staking import bet_profit, recommended_stake
 
-DEFAULT_SPORT = "basketball_nba"
 DISCLAIMER = "Informational only. Not financial advice. 18+. Please bet responsibly."
 
 
@@ -44,7 +45,7 @@ class PredictionsView(APIView):
         description="Model predictions (NN / XGBoost / ensemble) per game. DB → live → demo.",
     )
     def get(self, request: Request) -> Response:
-        sport = request.query_params.get("sport", DEFAULT_SPORT)
+        sport = clean_sport(request.query_params.get("sport"))
         db_games = Game.objects.filter(sport_key=sport).prefetch_related("predictions")
         if db_games.exists():
             data = GameSerializer(db_games, many=True).data
@@ -69,7 +70,7 @@ class BestBetsView(APIView):
         description="Ranked +EV picks. DB → live → demo. Personalizes stake when logged in.",
     )
     def get(self, request: Request) -> Response:
-        sport = request.query_params.get("sport", DEFAULT_SPORT)
+        sport = clean_sport(request.query_params.get("sport"))
         try:
             min_edge = Decimal(request.query_params.get("min_edge", "0"))
         except Exception:

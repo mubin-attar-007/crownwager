@@ -5,9 +5,12 @@ export { fmtOdds } from "@/lib/format";
 export function DemoBadge({ demo }: { demo: boolean }) {
   if (!demo) return null;
   return (
-    <span className="badge bg-warn/15 text-warn">
+    <span
+      className="badge bg-warn/15 text-warn"
+      title="Live odds are unavailable right now (no key configured or daily data limit reached) — showing sample data."
+    >
       <span className="h-1.5 w-1.5 rounded-full bg-warn animate-glow-pulse" />
-      demo data
+      sample data
     </span>
   );
 }

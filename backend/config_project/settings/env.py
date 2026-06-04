@@ -22,6 +22,10 @@ class Settings(BaseSettings):
     secret_key: str = "dev-insecure-secret-key-change-me"
     debug: bool = False
     allowed_hosts: str = "localhost,127.0.0.1,backend"
+    # Admin path (set to a hard-to-guess value in production, e.g. "ops-7f3a/").
+    admin_url: str = "admin/"
+    # Expose the OpenAPI docs (Swagger/Redoc). Keep false in production.
+    enable_api_docs: bool = False
 
     # ── Database / cache / broker ──────────────────────────────────
     # Defaults to SQLite + in-process cache so the API boots with zero external services

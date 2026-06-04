@@ -5,6 +5,7 @@ from .base import *  # noqa: F401,F403
 
 DEBUG = True
 ALLOWED_HOSTS = ["*"]
+ENABLE_API_DOCS = True  # Swagger/Redoc available in dev
 
 # Email to console in dev (no SMTP credentials needed).
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

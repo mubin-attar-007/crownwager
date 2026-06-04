@@ -7,10 +7,28 @@ import { AuthProvider } from "@/lib/auth";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 const sora = Sora({ subsets: ["latin"], variable: "--font-sora", display: "swap" });
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+const DESCRIPTION =
+  "Best bets, ML model predictions, live odds, and arbitrage tools. Find the edge. Informational only. 18+.";
+
 export const metadata: Metadata = {
-  title: "OddsAway — Data-Driven Sports Betting Analytics",
-  description:
-    "Best bets, ML model predictions, live odds, and arbitrage tools. Find the edge. Informational only. 18+.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "OddsAway — Data-Driven Sports Betting Analytics",
+    template: "%s · OddsAway",
+  },
+  description: DESCRIPTION,
+  applicationName: "OddsAway",
+  keywords: ["sports betting analytics", "+EV bets", "betting predictions", "odds comparison", "arbitrage"],
+  openGraph: {
+    title: "OddsAway — Find the edge. Bet with numbers, not vibes.",
+    description: DESCRIPTION,
+    siteName: "OddsAway",
+    type: "website",
+    url: SITE_URL,
+  },
+  twitter: { card: "summary_large_image", title: "OddsAway", description: DESCRIPTION },
+  robots: { index: true, follow: true },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
