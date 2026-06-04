@@ -12,7 +12,7 @@ const TITLES: Record<string, string> = {
   "/odds": "Odds Intelligence",
   "/arbitrage": "Arbitrage",
   "/scores": "Scores",
-  "/oddsbot": "OddsBot",
+  "/oddsbot": "CrownBot",
   "/watchlist": "Watchlist",
   "/bankroll": "Bankroll",
   "/learn": "Learn",
@@ -34,7 +34,7 @@ export default function TopBar({ onMenu }: { onMenu: () => void }) {
       <div className="flex-1" />
 
       <Link href="/oddsbot" className="btn-soft text-sm">
-        <Icon name="spark" size={16} /> <span className="hidden sm:inline">Ask OddsBot</span>
+        <Icon name="spark" size={16} /> <span className="hidden sm:inline">Ask CrownBot</span>
       </Link>
       <Link
         href={user ? "/profile" : "/login"}

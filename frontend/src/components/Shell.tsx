@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import OddsBot from "@/components/OddsBot";
+import CrownBot from "@/components/CrownBot";
 import Sidebar from "@/components/Sidebar";
 import TopBar from "@/components/TopBar";
 
@@ -28,7 +28,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
         <Navbar />
         <main className="container-x min-h-[70vh] py-10">{children}</main>
         <Footer />
-        <OddsBot />
+        <CrownBot />
       </>
     );
   }

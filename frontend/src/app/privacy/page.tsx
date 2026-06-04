@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
-  description: "How OddsAway handles your data. Informational sports-analytics tool. 18+.",
+  description: "How CrownWager handles your data. Informational sports-analytics tool. 18+.",
 };
 
 export default function PrivacyPage() {
@@ -20,7 +20,7 @@ export default function PrivacyPage() {
         <li>picks you save and bets you log for tracking.</li>
       </ul>
       <p>
-        We do <strong>not</strong> collect payment information — OddsAway never handles money. The notional
+        We do <strong>not</strong> collect payment information — CrownWager never handles money. The notional
         &ldquo;bankroll&rdquo; is just a number used to size suggested stakes; it is not real funds.
       </p>
 
@@ -32,7 +32,7 @@ export default function PrivacyPage() {
 
       <h2>3. Third parties</h2>
       <p>
-        Odds/scores come from third-party data providers; news from public feeds; and the OddsBot assistant
+        Odds/scores come from third-party data providers; news from public feeds; and the CrownBot assistant
         sends your messages (plus the current best-bets context) to a third-party language-model provider to
         generate replies. Those providers process that data under their own policies.
       </p>
@@ -50,7 +50,7 @@ export default function PrivacyPage() {
       </p>
 
       <h2>6. Children</h2>
-      <p>OddsAway is for users 18+ and is not directed at children.</p>
+      <p>CrownWager is for users 18+ and is not directed at children.</p>
 
       <h2>7. Changes</h2>
       <p>We may update this policy. See also our{" "}

@@ -50,9 +50,9 @@ class Settings(BaseSettings):
     email_host_user: str = ""
     email_host_password: str = ""
 
-    # ── Optional AI assistant (OddsBot) ────────────────────────────
+    # ── Optional AI assistant (CrownBot) ────────────────────────────
     # Either set ANTHROPIC_API_KEY, OR set the LLM_* vars for any OpenAI-compatible provider
-    # (Groq, Google Gemini, OpenRouter, Ollama, OpenAI). If neither is set, OddsBot uses its
+    # (Groq, Google Gemini, OpenRouter, Ollama, OpenAI). If neither is set, CrownBot uses its
     # offline rule-based fallback.
     anthropic_api_key: str = ""
     llm_api_key: str = ""

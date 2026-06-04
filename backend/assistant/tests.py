@@ -1,4 +1,4 @@
-"""Tests for the OddsBot assistant (offline-fallback path; no API key)."""
+"""Tests for the CrownBot assistant (offline-fallback path; no API key)."""
 from __future__ import annotations
 
 import pytest

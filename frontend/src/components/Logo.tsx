@@ -26,8 +26,8 @@ export default function Logo({ size = 30 }: { size?: number }) {
     <span className="flex items-center gap-2">
       <LogoMark size={size} />
       <span className="text-lg font-extrabold tracking-tight font-display">
-        <span className="gradient-text">Odds</span>
-        <span className="text-white">Away</span>
+        <span className="gradient-text">Crown</span>
+        <span className="text-white">Wager</span>
       </span>
     </span>
   );

@@ -1,18 +1,18 @@
 # One-command local stack:  docker compose -f infrastructure/docker-compose.yml up --build
 # Services: Postgres, Redis, Django API, Celery worker + beat, AI service, Next.js frontend.
-name: oddsaway
+name: crownwager
 
 services:
   db:
     image: postgres:16-alpine
     environment:
-      POSTGRES_DB: oddsaway
-      POSTGRES_USER: oddsaway
-      POSTGRES_PASSWORD: oddsaway
+      POSTGRES_DB: crownwager
+      POSTGRES_USER: crownwager
+      POSTGRES_PASSWORD: crownwager
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U oddsaway"]
+      test: ["CMD-SHELL", "pg_isready -U crownwager"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -35,7 +35,7 @@ services:
       dockerfile: infrastructure/docker/Dockerfile.backend
     env_file: .env
     environment:
-      DATABASE_URL: postgresql://oddsaway:oddsaway@db:5432/oddsaway
+      DATABASE_URL: postgresql://crownwager:crownwager@db:5432/crownwager
       REDIS_URL: redis://redis:6379/0
       CACHE_BACKEND: redis
       AI_SERVICE_URL: http://ai:8001
@@ -59,7 +59,7 @@ services:
       dockerfile: infrastructure/docker/Dockerfile.backend
     env_file: .env
     environment:
-      DATABASE_URL: postgresql://oddsaway:oddsaway@db:5432/oddsaway
+      DATABASE_URL: postgresql://crownwager:crownwager@db:5432/crownwager
       REDIS_URL: redis://redis:6379/0
       CACHE_BACKEND: redis
     command: celery -A config_project worker -l info
@@ -73,7 +73,7 @@ services:
       dockerfile: infrastructure/docker/Dockerfile.backend
     env_file: .env
     environment:
-      DATABASE_URL: postgresql://oddsaway:oddsaway@db:5432/oddsaway
+      DATABASE_URL: postgresql://crownwager:crownwager@db:5432/crownwager
       REDIS_URL: redis://redis:6379/0
       CACHE_BACKEND: redis
     command: celery -A config_project beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler

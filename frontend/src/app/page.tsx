@@ -34,7 +34,7 @@ export default function Home() {
           Find the <span className="gradient-text">edge</span>.<br />Bet with numbers, not vibes.
         </h1>
         <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-300 animate-fade-up">
-          OddsAway compares our models&apos; true probabilities against sportsbook odds to surface
+          CrownWager compares our models&apos; true probabilities against sportsbook odds to surface
           positive expected-value picks, predictions, and arbitrage — all in one place.
         </p>
         <div className="mt-9 flex flex-wrap justify-center gap-3 animate-fade-up">

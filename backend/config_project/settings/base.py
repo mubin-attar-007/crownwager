@@ -121,7 +121,7 @@ REST_FRAMEWORK = {
         "rest_framework.throttling.AnonRateThrottle",
         "rest_framework.throttling.UserRateThrottle",
     ),
-    # `assistant` is a strict scope for the LLM-backed OddsBot endpoint (cost/abuse control).
+    # `assistant` is a strict scope for the LLM-backed CrownBot endpoint (cost/abuse control).
     "DEFAULT_THROTTLE_RATES": {"anon": "60/min", "user": "240/min", "assistant": "10/min"},
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 25,
@@ -137,7 +137,7 @@ SIMPLE_JWT = {
 }
 
 SPECTACULAR_SETTINGS = {
-    "TITLE": "OddsAway API",
+    "TITLE": "CrownWager API",
     "DESCRIPTION": "Sports-betting analytics & predictions — best bets, odds, arbitrage, ML picks. "
     "Informational only; no real-money wagering. 18+. Please bet responsibly.",
     "VERSION": "0.1.0",

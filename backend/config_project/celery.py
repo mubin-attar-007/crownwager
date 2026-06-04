@@ -7,7 +7,7 @@ from celery import Celery
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config_project.settings.dev")
 
-app = Celery("oddsaway")
+app = Celery("crownwager")
 app.config_from_object("django.conf:settings", namespace="CELERY")
 app.autodiscover_tasks()
 

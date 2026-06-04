@@ -13,7 +13,7 @@ const NAV: { href: string; label: string; icon: IconName }[] = [
   { href: "/odds", label: "Odds Intelligence", icon: "table" },
   { href: "/arbitrage", label: "Arbitrage", icon: "swap" },
   { href: "/scores", label: "Scores", icon: "trophy" },
-  { href: "/oddsbot", label: "OddsBot", icon: "spark" },
+  { href: "/oddsbot", label: "CrownBot", icon: "spark" },
   { href: "/watchlist", label: "Watchlist", icon: "bookmark" },
   { href: "/bankroll", label: "Bankroll", icon: "wallet" },
   { href: "/learn", label: "Learn", icon: "book" },
@@ -26,10 +26,10 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <aside className="flex h-full w-64 flex-col border-r border-white/[0.06] bg-ink-900/60 backdrop-blur-xl">
       <div className="flex h-16 items-center px-5">
-        <Link href="/" aria-label="OddsAway home" className="flex items-center gap-2">
+        <Link href="/" aria-label="CrownWager home" className="flex items-center gap-2">
           <LogoMark size={26} />
           <span className="text-base font-extrabold tracking-tight font-display">
-            <span className="gradient-text">Odds</span><span className="text-white">Away</span>
+            <span className="gradient-text">Crown</span><span className="text-white">Wager</span>
           </span>
         </Link>
       </div>

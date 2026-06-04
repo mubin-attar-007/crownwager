@@ -1,6 +1,6 @@
 # Keeps live predictions + news fresh on a free host that has no always-on worker.
 # Enable by adding two repo secrets (Settings → Secrets → Actions):
-#   BACKEND_URL    e.g. https://oddsaway-backend.onrender.com
+#   BACKEND_URL    e.g. https://crownwager-backend.onrender.com
 #   REFRESH_TOKEN  the same value set on the backend's REFRESH_TOKEN env var
 name: Scheduled data refresh
 

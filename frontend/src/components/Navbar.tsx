@@ -23,7 +23,7 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-40 border-b border-white/[0.06] bg-ink-950/70 backdrop-blur-xl">
       <nav className="container-x flex h-16 items-center justify-between">
-        <Link href="/" aria-label="OddsAway home">
+        <Link href="/" aria-label="CrownWager home">
           <Logo />
         </Link>
 

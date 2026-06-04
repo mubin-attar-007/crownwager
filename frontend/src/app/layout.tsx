@@ -14,20 +14,20 @@ const DESCRIPTION =
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "OddsAway — Data-Driven Sports Betting Analytics",
-    template: "%s · OddsAway",
+    default: "CrownWager — Data-Driven Sports Betting Analytics",
+    template: "%s · CrownWager",
   },
   description: DESCRIPTION,
-  applicationName: "OddsAway",
+  applicationName: "CrownWager",
   keywords: ["sports betting analytics", "+EV bets", "betting predictions", "odds comparison", "arbitrage"],
   openGraph: {
-    title: "OddsAway — Find the edge. Bet with numbers, not vibes.",
+    title: "CrownWager — Find the edge. Bet with numbers, not vibes.",
     description: DESCRIPTION,
-    siteName: "OddsAway",
+    siteName: "CrownWager",
     type: "website",
     url: SITE_URL,
   },
-  twitter: { card: "summary_large_image", title: "OddsAway", description: DESCRIPTION },
+  twitter: { card: "summary_large_image", title: "CrownWager", description: DESCRIPTION },
   robots: { index: true, follow: true },
 };
 

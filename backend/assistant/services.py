@@ -1,4 +1,4 @@
-"""OddsBot — a Claude-powered assistant grounded in the platform's current best bets.
+"""CrownBot — a Claude-powered assistant grounded in the platform's current best bets.
 
 Falls back to a deterministic, rule-based summary when ``ANTHROPIC_API_KEY`` is not configured, so
 the feature is always demoable. The Anthropic call uses prompt caching on the system prompt.
@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 ASSISTANT_MODEL = "claude-haiku-4-5-20251001"
 
 SYSTEM_PROMPT = (
-    "You are OddsBot, the assistant for OddsAway — a data-driven sports-betting ANALYTICS tool. "
+    "You are CrownBot, the assistant for CrownWager — a data-driven sports-betting ANALYTICS tool. "
     "You explain betting concepts (expected value, Kelly criterion, arbitrage, odds formats) and help "
     "users interpret the platform's model picks. Rules you must always follow:\n"
     "- This is INFORMATIONAL ONLY. Never tell anyone to place a specific wager; never promise profit or "
@@ -44,7 +44,7 @@ def build_context(sport: str) -> str:
 
 def _fallback_reply(message: str, context: str) -> str:
     return (
-        "OddsBot is running in offline mode (no AI key configured), so here's a data summary instead of "
+        "CrownBot is running in offline mode (no AI key configured), so here's a data summary instead of "
         f"a conversational answer.\n\n{context}\n\nReminder: this is informational only — bet responsibly, 18+."
     )
 
@@ -116,5 +116,5 @@ def chat(message: str, history: list[dict] | None = None, sport: str = "basketba
             return _anthropic_chat(message, history, context)
         return _openai_compatible_chat(message, history, context)
     except Exception as exc:  # pragma: no cover - network/SDK errors
-        logger.warning("OddsBot LLM call failed (%s): %s", provider, exc)
+        logger.warning("CrownBot LLM call failed (%s): %s", provider, exc)
         return {"reply": _fallback_reply(message, context), "powered_by": "offline-fallback"}
