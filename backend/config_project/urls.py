@@ -11,6 +11,8 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
 )
 
+from common.views import ApiRootView
+
 api_patterns = [
     path("", include("common.urls")),
     path("auth/", include("accounts.urls")),
@@ -21,6 +23,7 @@ api_patterns = [
 ]
 
 urlpatterns: list = [
+    path("", ApiRootView.as_view(), name="api-root"),
     # Admin path is configurable (set ADMIN_URL to a non-obvious value in prod).
     path(settings.ADMIN_URL, admin.site.urls),
     path("api/", include(api_patterns)),
