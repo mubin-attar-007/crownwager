@@ -1,4 +1,3 @@
-<!-- The block below configures the Hugging Face Space (Docker). It is harmless on GitHub. -->
 ---
 title: CrownWager
 emoji: 👑
@@ -10,6 +9,8 @@ pinned: false
 ---
 
 # CrownWager — Data-Driven Sports Betting Analytics
+
+<!-- The YAML block above configures the Hugging Face Space (Docker). It renders as a small table on GitHub. -->
 
 A modern, full-stack sports-betting **analytics & predictions** platform (inspired by
 [dimers.com](https://www.dimers.com)): daily **+EV best bets**, **ML model predictions**, **live
