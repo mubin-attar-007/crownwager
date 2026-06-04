@@ -40,6 +40,30 @@ class HealthView(APIView):
         return Response(payload, status=code)
 
 
+class ApiRootView(APIView):
+    """Friendly landing for the bare root so `/` doesn't 404 (the real UI is the frontend)."""
+
+    permission_classes = [AllowAny]
+    throttle_classes: list = []
+
+    def get(self, request: Request) -> Response:
+        return Response(
+            {
+                "service": "crownwager-api",
+                "status": "ok",
+                "endpoints": {
+                    "health": "/api/health/",
+                    "best_bets": "/api/best-bets/",
+                    "predictions": "/api/predictions/",
+                    "odds": "/api/odds/",
+                    "scores": "/api/scores/",
+                    "arbitrage": "/api/arbitrage/",
+                },
+                "note": "Informational only. 18+. Please bet responsibly. The web app is the frontend.",
+            }
+        )
+
+
 class RefreshView(APIView):
     """Token-guarded endpoint to refresh predictions + news. Called by a scheduled GitHub Action
     (free Render has no always-on Celery worker). Disabled unless REFRESH_TOKEN is configured."""
