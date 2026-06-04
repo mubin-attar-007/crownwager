@@ -6,6 +6,7 @@ from rest_framework import serializers
 from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from .services import chat
@@ -13,17 +14,21 @@ from .services import chat
 
 class ChatMessageSerializer(serializers.Serializer):
     role = serializers.ChoiceField(choices=["user", "assistant"])
-    content = serializers.CharField()
+    content = serializers.CharField(max_length=2000)
 
 
 class ChatRequestSerializer(serializers.Serializer):
-    message = serializers.CharField(max_length=2000)
-    sport = serializers.CharField(required=False, default="basketball_nba")
+    message = serializers.CharField(max_length=500)
+    sport = serializers.CharField(required=False, default="basketball_nba", max_length=40)
     history = ChatMessageSerializer(many=True, required=False, default=list)
 
 
 class ChatView(APIView):
+    # LLM-backed: strictly throttled (10/min, see DEFAULT_THROTTLE_RATES['assistant'])
+    # to prevent cost/quota abuse of the OddsBot endpoint.
     permission_classes = [AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "assistant"
 
     @extend_schema(
         request=ChatRequestSerializer,

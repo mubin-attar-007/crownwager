@@ -1,6 +1,7 @@
 """Shared Django settings. Environment-specific overrides live in dev.py / prod.py."""
 from __future__ import annotations
 
+from datetime import timedelta
 from pathlib import Path
 
 import dj_database_url
@@ -14,6 +15,11 @@ SECRET_KEY = env.secret_key
 DEBUG = env.debug
 ALLOWED_HOSTS = env.allowed_hosts_list
 
+# Baseline security headers (safe in every environment; prod.py adds HTTPS-only ones).
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
+X_FRAME_OPTIONS = "DENY"
+
 # ── Applications ───────────────────────────────────────────────────
 DJANGO_APPS = [
     "django.contrib.admin",
@@ -26,6 +32,7 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
     "drf_spectacular",
     "corsheaders",
     "django_filters",
@@ -114,9 +121,19 @@ REST_FRAMEWORK = {
         "rest_framework.throttling.AnonRateThrottle",
         "rest_framework.throttling.UserRateThrottle",
     ),
-    "DEFAULT_THROTTLE_RATES": {"anon": "60/min", "user": "240/min"},
+    # `assistant` is a strict scope for the LLM-backed OddsBot endpoint (cost/abuse control).
+    "DEFAULT_THROTTLE_RATES": {"anon": "60/min", "user": "240/min", "assistant": "10/min"},
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 25,
+}
+
+# ── JWT (short access token + rotating, blacklisted refresh) ────────
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "UPDATE_LAST_LOGIN": True,
 }
 
 SPECTACULAR_SETTINGS = {
@@ -174,6 +191,11 @@ ANTHROPIC_API_KEY = env.anthropic_api_key
 LLM_API_KEY = env.llm_api_key
 LLM_BASE_URL = env.llm_base_url
 LLM_MODEL = env.llm_model
+
+# ── Admin path + API docs visibility ───────────────────────────────
+ADMIN_URL = env.admin_url.strip("/") + "/"
+# Docs are off by default; dev.py turns them on, prod can opt in via ENABLE_API_DOCS env var.
+ENABLE_API_DOCS = env.enable_api_docs
 
 # ── Logging (structured-ish, all apps to console) ──────────────────
 LOGGING = {

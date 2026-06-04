@@ -3,7 +3,8 @@
 FROM python:3.12-slim AS base
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=1
+    PIP_NO_CACHE_DIR=1 \
+    WEB_CONCURRENCY=3
 
 WORKDIR /app
 
@@ -21,6 +22,11 @@ RUN if [ "$INSTALL_DEV" = "true" ]; then pip install -r requirements-dev.txt; \
 # ── app source ─────────────────────────────────────────────────────
 COPY backend/ /app/
 
+# Run as a non-root user in production.
+RUN useradd --create-home --uid 10001 appuser && chown -R appuser:appuser /app
+USER appuser
+
 EXPOSE 8000
-# Default command: migrate then serve via gunicorn. Override in compose for dev/celery.
-CMD ["sh", "-c", "python manage.py migrate --noinput && gunicorn config_project.wsgi:application --bind 0.0.0.0:8000 --workers 3"]
+# Production: migrate then serve via gunicorn (worker count from WEB_CONCURRENCY).
+# docker-compose overrides this command for local dev (adds seed + news + predictions refresh).
+CMD ["sh", "-c", "python manage.py migrate --noinput && python manage.py collectstatic --noinput && gunicorn config_project.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers ${WEB_CONCURRENCY:-3} --timeout 60"]

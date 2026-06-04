@@ -1,0 +1,62 @@
+# Render Blueprint — deploys the backend API + AI service on Render's FREE tier.
+# Postgres → Neon (free), Redis → Upstash (free), Frontend → Vercel (free). See docs/DEPLOYMENT.md.
+# Secrets (sync:false) are set in the Render dashboard, never committed.
+services:
+  - type: web
+    name: oddsaway-ai
+    runtime: docker
+    dockerfilePath: ./infrastructure/docker/Dockerfile.ai
+    dockerContext: .
+    plan: free
+    autoDeploy: true
+    envVars:
+      - key: MODEL_DIR
+        value: /app/ai/models
+      - key: PORT
+        value: "8001"
+
+  - type: web
+    name: oddsaway-backend
+    runtime: docker
+    dockerfilePath: ./infrastructure/docker/Dockerfile.backend
+    dockerContext: .
+    plan: free
+    autoDeploy: true
+    healthCheckPath: /api/health/
+    envVars:
+      - key: DJANGO_ENV
+        value: prod
+      - key: DJANGO_SETTINGS_MODULE
+        value: config_project.settings.prod
+      - key: SECRET_KEY
+        generateValue: true          # Render generates a strong secret
+      - key: DEBUG
+        value: "false"
+      - key: WEB_CONCURRENCY
+        value: "2"
+      - key: CACHE_BACKEND
+        value: redis
+      - key: LLM_BASE_URL
+        value: https://generativelanguage.googleapis.com/v1beta/openai/
+      - key: LLM_MODEL
+        value: gemini-2.5-flash
+      - key: AI_SERVICE_URL            # internal URL of the AI service above
+        fromService:
+          name: oddsaway-ai
+          type: web
+          property: hostport
+      # ── Set these in the Render dashboard (sync:false = not in git) ──
+      - key: ALLOWED_HOSTS            # e.g. oddsaway-backend.onrender.com
+        sync: false
+      - key: CORS_ALLOWED_ORIGINS     # e.g. https://oddsaway.vercel.app
+        sync: false
+      - key: DATABASE_URL             # from Neon
+        sync: false
+      - key: REDIS_URL                # from Upstash
+        sync: false
+      - key: ODDS_API_KEY             # the-odds-api.com (rotate the one shared in chat!)
+        sync: false
+      - key: LLM_API_KEY              # Google AI Studio (rotate the one shared in chat!)
+        sync: false
+      - key: ADMIN_URL                # a hard-to-guess admin path, e.g. ops-7f3a9c/
+        sync: false

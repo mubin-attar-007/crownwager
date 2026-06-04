@@ -9,7 +9,11 @@ import Sidebar from "@/components/Sidebar";
 import TopBar from "@/components/TopBar";
 
 const MARKETING = (path: string) =>
-  path === "/" || path.startsWith("/login") || path.startsWith("/register");
+  path === "/" ||
+  path.startsWith("/login") ||
+  path.startsWith("/register") ||
+  path.startsWith("/terms") ||
+  path.startsWith("/privacy");
 
 export default function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();

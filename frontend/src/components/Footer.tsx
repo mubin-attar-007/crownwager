@@ -62,9 +62,13 @@ export default function Footer() {
           ))}
         </div>
 
-        <div className="mt-10 flex flex-col items-center justify-between gap-2 border-t border-white/[0.06] pt-6 text-xs text-slate-500 sm:flex-row">
-          <p>© {new Date().getFullYear()} OddsAway — a data-driven sports analytics demo.</p>
-          <p>Informational only · No real-money wagering · 18+</p>
+        <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-white/[0.06] pt-6 text-xs text-slate-500 sm:flex-row">
+          <p>© {new Date().getFullYear()} OddsAway — data-driven sports analytics.</p>
+          <div className="flex items-center gap-4">
+            <Link href="/terms" className="hover:text-brand-300">Terms</Link>
+            <Link href="/privacy" className="hover:text-brand-300">Privacy</Link>
+            <span>Informational only · 18+</span>
+          </div>
         </div>
       </div>
     </footer>

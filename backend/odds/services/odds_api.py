@@ -18,8 +18,10 @@ from django.core.cache import cache
 logger = logging.getLogger(__name__)
 
 DEFAULT_TIMEOUT = 10  # seconds
-ODDS_CACHE_TTL = 300  # 5 minutes
-SCORES_CACHE_TTL = 60
+# Longer TTLs conserve The Odds API free-tier quota (~500 req/month). The Redis cache is shared
+# across all users, so one upstream call serves everyone for the TTL window.
+ODDS_CACHE_TTL = 900  # 15 minutes
+SCORES_CACHE_TTL = 300  # 5 minutes
 
 
 class OddsAPIError(Exception):
