@@ -10,9 +10,9 @@ and **OddsBot** — a Claude-powered assistant grounded in the current best bets
 
 This repository is a ground-up rebuild of a legacy Django monolith that scored **2.3/10** in a
 12-dimension assessment (security, scalability, testability, and deployment all rated *Critical*).
-The old code is preserved untouched under [`_archived/`](./_archived/README.md); only genuinely
-valuable domain logic (the arbitrage algorithm, EV/Kelly math, ML concepts, auth patterns, and the
-landing design language) was carried forward.
+The legacy project was assessed and then removed once everything valuable had been migrated — the
+arbitrage algorithm, EV/Kelly math, the NBA dataset + trained model, auth patterns, and the landing
+design language. The training data that backs the ML model is preserved under `ai/data/training/`.
 
 ## Architecture
 
@@ -30,12 +30,11 @@ landing design language) was carried forward.
 
 - **`backend/`** — Django 5.1 + DRF API (auth/JWT, odds, arbitrage, predictions, best-bets, content),
   service + repository layers, Celery + Redis for async jobs and caching. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
-- **`ai/`** — standalone FastAPI prediction service with a model registry, feature engineering, and a
-  transparent baseline model (pluggable for the validated NN/XGBoost). See [docs/ML_MODELS.md](docs/ML_MODELS.md).
+- **`ai/`** — standalone FastAPI prediction service: model registry + a **validated XGBoost NBA
+  moneyline model** (65% CV accuracy), with a transparent baseline fallback. See [docs/ML_MODELS.md](docs/ML_MODELS.md).
 - **`frontend/`** — Next.js 15 (React 19) + TypeScript + Tailwind dashboard.
 - **`infrastructure/`** — Docker, docker-compose, env templates.
 - **`docs/`** — architecture, API, ML, security, deployment, responsible-gambling.
-- **`_archived/`** — the original legacy project (reference only).
 
 ## Quick start (one command)
 
