@@ -100,12 +100,29 @@ npm run dev                          # http://localhost:3000
 | AI | `pytest ai/tests` | 5 tests: features, engine, `/health`, `/predict` |
 | Frontend | `cd frontend && npm test` | format helpers (Vitest) |
 
-Quality gates (all clean, enforced in CI): `ruff` + `mypy` + `bandit` (backend); `eslint` + `tsc` (frontend).
+Quality gates enforced in CI on every push: `ruff` + **`bandit` (blocking, medium+)** + tests with a
+coverage report (backend); `eslint` + `tsc` + `next build` (frontend); a **gitleaks** secret scan over
+full history; and informational `pip-audit` / `npm audit`. Dependency bumps are automated via
+**Dependabot**. See [.github/workflows/ci.yml](.github/workflows/ci.yml) and
+[.github/dependabot.yml](.github/dependabot.yml).
 
-CI runs all three on every push — see [.github/workflows/ci.yml](.github/workflows/ci.yml).
+## Security & configuration flags
+
+Everything below defaults **OFF** so the live app is unchanged until you opt in.
+
+| Flag(s) | Effect |
+|---|---|
+| `AUTH_COOKIE_ENABLED` (backend) + `NEXT_PUBLIC_AUTH_COOKIE_ENABLED` + `API_PROXY_TARGET` (frontend) | Serve the JWT in **HttpOnly cookies** via a same-origin `/api` proxy instead of localStorage/Bearer (CSRF handled by `SameSite=Lax`). The Bearer flow keeps working regardless. |
+| `ADMIN_2FA_ENABLED` (backend) | Require a verified **TOTP device** for the Django admin (django-otp). **Enroll a device first**, then enable — otherwise you lock yourself out. |
+| `SENTRY_DSN` (backend) / `NEXT_PUBLIC_SENTRY_DSN` (frontend) | DSN-gated **Sentry** error tracking (PII off). |
+| `NUM_PROXIES`, `ADMIN_URL` | Proxy-aware per-IP throttling; non-obvious admin path. |
 
 ## Status
 
-This is an MVP / college-project-grade rebuild that is **runnable, tested, and containerized**.
-Production hardening (managed Postgres/Redis, K8s/IaC, Sentry/observability, model retraining +
-validation, secret manager) is intentionally deferred — see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+Runnable, tested, containerized — and **production-hardened**: proxy-aware per-IP rate limiting,
+constant-time token comparison, DSN-gated **Sentry**, an AI-service **circuit breaker** (fail-fast when
+the model service is down), CSP + React error boundaries on the frontend, blocking **bandit** +
+**gitleaks** + dependency audits in CI, and a tested DB **backup/restore** runbook
+([docs/BACKUP.md](docs/BACKUP.md)). Auth supports classic JWT **or** HttpOnly-cookie JWT + optional
+admin 2FA (see flags above). Still deferred by design: managed Postgres/Redis, K8s/IaC, and model
+retraining/validation — see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
