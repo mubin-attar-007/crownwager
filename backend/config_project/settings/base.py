@@ -124,7 +124,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # ── DRF + JWT + OpenAPI ────────────────────────────────────────────
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        # Cookie-aware JWT: reads the HttpOnly access cookie, else the Authorization header
+        # (so existing Bearer clients keep working unchanged).
+        "accounts.authentication.CookieJWTAuthentication",
         "rest_framework.authentication.SessionAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticatedOrReadOnly",),
@@ -151,6 +153,16 @@ SIMPLE_JWT = {
     "BLACKLIST_AFTER_ROTATION": True,
     "UPDATE_LAST_LOGIN": True,
 }
+
+# ── Auth cookies (opt-in; see accounts/authentication.py + accounts/views.py) ──────
+# When AUTH_COOKIE_ENABLED, login/register/refresh also set the JWT as HttpOnly cookies.
+# Backward compatible: the Authorization: Bearer header still works.
+AUTH_COOKIE_ENABLED = env.auth_cookie_enabled
+AUTH_ACCESS_COOKIE = "cw_access"
+AUTH_REFRESH_COOKIE = "cw_refresh"
+AUTH_COOKIE_SAMESITE = env.auth_cookie_samesite  # "Lax" same-origin; "None" cross-origin (+ Secure)
+AUTH_COOKIE_SECURE = False  # overridden to True in prod.py
+AUTH_COOKIE_PATH = "/"
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "CrownWager API",

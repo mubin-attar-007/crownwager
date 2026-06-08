@@ -38,6 +38,9 @@ SESSION_COOKIE_SAMESITE = "Strict"
 CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_HTTPONLY = True
 CSRF_COOKIE_SAMESITE = "Strict"
+# JWT auth cookies are always Secure in production (required when SAMESITE="None" for a
+# cross-origin SPA). Set AUTH_COOKIE_SAMESITE=None via env once the frontend uses cookies.
+AUTH_COOKIE_SECURE = True
 
 # ── Email via SMTP (credentials from env only) ─────────────────────
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
