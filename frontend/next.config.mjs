@@ -26,6 +26,14 @@ const nextConfig = {
   reactStrictMode: true,
   output: "standalone",
   poweredByHeader: false,
+  // Same-origin API proxy (used in cookie-auth mode): the browser calls /api/* and Next forwards
+  // to the backend, so JWT cookies stay same-origin (SameSite=Lax) and CSRF is handled by SameSite.
+  // Set API_PROXY_TARGET to the backend ORIGIN (the Django app serves under /api). Unused by the
+  // legacy localStorage flow, which calls NEXT_PUBLIC_API_BASE_URL directly.
+  async rewrites() {
+    const target = (process.env.API_PROXY_TARGET ?? "http://localhost:8000").replace(/\/+$/, "");
+    return [{ source: "/api/:path*", destination: `${target}/api/:path*` }];
+  },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

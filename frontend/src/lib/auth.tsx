@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import type { ReactNode } from "react";
-import { api, clearTokens, getToken, setTokens } from "./api";
+import { api, clearTokens, COOKIE_MODE, getToken, setTokens } from "./api";
 import type { CurrentUser } from "./types";
 
 interface AuthState {
@@ -10,7 +10,7 @@ interface AuthState {
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
 
@@ -28,7 +28,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const refreshUser = useCallback(async () => {
-    if (!getToken()) {
+    // Legacy mode short-circuits when there's no localStorage token. Cookie mode can't read the
+    // HttpOnly cookie, so it always asks /auth/me/ and lets a 401 mean "not signed in".
+    if (!COOKIE_MODE && !getToken()) {
       setUser(null);
       setLoading(false);
       return;
@@ -67,8 +69,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading(false);
   }
 
-  function logout() {
-    clearTokens();
+  async function logout() {
+    if (COOKIE_MODE) {
+      // Only the server can clear the HttpOnly cookies; ignore failures (already logged out).
+      try {
+        await api.post("/auth/logout/", {});
+      } catch {
+        /* no-op */
+      }
+    } else {
+      clearTokens();
+    }
     setUser(null);
   }
 
