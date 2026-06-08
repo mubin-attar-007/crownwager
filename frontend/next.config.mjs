@@ -4,7 +4,7 @@
 // origin/domain (set via NEXT_PUBLIC_API_BASE_URL). 'unsafe-inline' is needed for Next/Tailwind.
 const csp = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+  "script-src 'self' 'unsafe-inline'",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: https:",
   "font-src 'self' data:",
