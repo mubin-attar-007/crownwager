@@ -19,10 +19,13 @@ jobs:
       - run: pip install -r requirements-dev.txt
       - name: Lint (ruff)
         run: ruff check .
-      - name: Security scan (bandit)
-        run: bandit -q -r . -x ./*/migrations,./*/tests.py || true
-      - name: Tests
-        run: pytest -q
+      - name: Security scan (bandit, medium+ blocking)
+        run: bandit -q --severity-level medium -r . -x ./*/migrations,./*/tests.py
+      - name: Dependency vulnerability audit (informational)
+        run: pip-audit
+        continue-on-error: true
+      - name: Tests (with coverage report)
+        run: pytest -q --cov=. --cov-report=term-missing
         env:
           DJANGO_SETTINGS_MODULE: config_project.settings.dev
 
@@ -34,6 +37,9 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -r ai/requirements.txt
+      - name: Dependency vulnerability audit (informational)
+        run: pip install pip-audit && pip-audit
+        continue-on-error: true
       - name: Tests
         run: pytest ai/tests -q
 
@@ -47,10 +53,27 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - run: npm install --no-audit --no-fund
+      - run: npm ci
       - name: Unit tests
         run: npm test
+      - name: npm audit (informational)
+        run: npm audit --audit-level=high
+        continue-on-error: true
       - name: Production build
         run: npm run build
         env:
           NEXT_TELEMETRY_DISABLED: "1"
+
+  secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      # License-free gitleaks binary (matches the other repos), pinned.
+      - name: Install gitleaks
+        run: |
+          curl -sSfL https://github.com/gitleaks/gitleaks/releases/download/v8.21.2/gitleaks_8.21.2_linux_x64.tar.gz \
+            | sudo tar -xz -C /usr/local/bin gitleaks
+      - name: Secret scan (full history)
+        run: gitleaks detect --source . --redact --no-banner -v
