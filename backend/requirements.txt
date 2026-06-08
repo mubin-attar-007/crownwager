@@ -11,6 +11,7 @@ psycopg[binary]>=3.2
 redis>=5.0
 celery>=5.4,<5.5
 django-celery-beat>=2.7
+django-otp>=1.5,<2
 requests>=2.32
 feedparser>=6.0
 Pillow>=10.4
