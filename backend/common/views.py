@@ -1,6 +1,8 @@
 """Health, liveness, and a token-guarded scheduled-refresh endpoint."""
 from __future__ import annotations
 
+import hmac
+
 from django.conf import settings
 from django.db import connection
 from drf_spectacular.utils import extend_schema
@@ -74,7 +76,9 @@ class RefreshView(APIView):
     @extend_schema(description="Internal: refresh predictions + news. Requires X-Refresh-Token header.")
     def post(self, request: Request) -> Response:
         token = settings.REFRESH_TOKEN
-        if not token or request.headers.get("X-Refresh-Token") != token:
+        presented = request.headers.get("X-Refresh-Token", "")
+        # Constant-time comparison avoids a timing oracle on the shared secret.
+        if not token or not hmac.compare_digest(presented, token):
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
         from content.services import fetch_and_store_news

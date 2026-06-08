@@ -36,6 +36,8 @@ services:
         value: "2"
       - key: CACHE_BACKEND
         value: redis
+      - key: NUM_PROXIES
+        value: "1"          # Render terminates TLS at one edge proxy; throttle on real client IP (XFF)
       - key: LLM_BASE_URL
         value: https://generativelanguage.googleapis.com/v1beta/openai/
       - key: LLM_MODEL
