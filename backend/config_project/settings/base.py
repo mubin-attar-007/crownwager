@@ -125,6 +125,9 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_RATES": {"anon": "60/min", "user": "240/min", "assistant": "10/min"},
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 25,
+    # Trust N front proxies so per-IP throttling uses the real client IP (X-Forwarded-For),
+    # not the shared edge IP. Set NUM_PROXIES=1 in prod (Render); 0 locally.
+    "NUM_PROXIES": env.num_proxies,
 }
 
 # ── JWT (short access token + rotating, blacklisted refresh) ────────

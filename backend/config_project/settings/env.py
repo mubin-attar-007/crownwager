@@ -29,6 +29,9 @@ class Settings(BaseSettings):
     # Force HTTPS redirect in prod. Disable on platforms that terminate TLS at a proxy
     # and route to the container over HTTP (e.g. Hugging Face Spaces) to avoid redirect loops.
     secure_ssl_redirect: bool = True
+    # Trusted proxies in front of the app (Render/HF edge). Lets DRF throttling key on the
+    # real client IP from X-Forwarded-For instead of the shared proxy IP. 0 = use REMOTE_ADDR.
+    num_proxies: int = 0
 
     # ── Database / cache / broker ──────────────────────────────────
     # Defaults to SQLite + in-process cache so the API boots with zero external services
