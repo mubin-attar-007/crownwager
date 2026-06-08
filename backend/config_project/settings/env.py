@@ -50,6 +50,10 @@ class Settings(BaseSettings):
     # Shared secret for the scheduled-refresh endpoint (blank = endpoint disabled).
     refresh_token: str = ""
 
+    # ── Observability ──────────────────────────────────────────────
+    # Sentry error tracking (blank = disabled / no-op).
+    sentry_dsn: str = ""
+
     # ── Email (optional) ───────────────────────────────────────────
     email_host: str = "smtp.gmail.com"
     email_port: int = 587
