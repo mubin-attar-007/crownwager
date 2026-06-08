@@ -24,6 +24,9 @@ class Settings(BaseSettings):
     allowed_hosts: str = "localhost,127.0.0.1,backend"
     # Admin path (set to a hard-to-guess value in production, e.g. "ops-7f3a/").
     admin_url: str = "admin/"
+    # Require a verified TOTP device for the Django admin. Enroll a device BEFORE enabling
+    # (otherwise you lock yourself out — see config_project/urls.py).
+    admin_2fa_enabled: bool = False
     # Expose the OpenAPI docs (Swagger/Redoc). Keep false in production.
     enable_api_docs: bool = False
     # Force HTTPS redirect in prod. Disable on platforms that terminate TLS at a proxy

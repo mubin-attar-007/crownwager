@@ -50,6 +50,9 @@ THIRD_PARTY_APPS = [
     "corsheaders",
     "django_filters",
     "django_celery_beat",
+    "django_otp",
+    "django_otp.plugins.otp_totp",
+    "django_otp.plugins.otp_static",
 ]
 LOCAL_APPS = [
     "common",
@@ -69,9 +72,14 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django_otp.middleware.OTPMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+# Require a verified TOTP device to reach the Django admin (django-otp). Opt-in: enroll a device
+# while this is off, then set ADMIN_2FA_ENABLED=true. Enforcement is wired in config_project/urls.py.
+ADMIN_2FA_ENABLED = env.admin_2fa_enabled
 
 ROOT_URLCONF = "config_project.urls"
 WSGI_APPLICATION = "config_project.wsgi.application"

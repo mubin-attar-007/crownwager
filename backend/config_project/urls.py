@@ -13,6 +13,14 @@ from drf_spectacular.views import (
 
 from common.views import ApiRootView
 
+# When admin 2FA is enabled, require a verified OTP device to reach the Django admin (django-otp).
+# Enroll a TOTP device FIRST (with this off), then set ADMIN_2FA_ENABLED=true — otherwise the admin
+# locks you out (no verified device = no access).
+if settings.ADMIN_2FA_ENABLED:
+    from django_otp.admin import OTPAdminSite
+
+    admin.site.__class__ = OTPAdminSite
+
 api_patterns = [
     path("", include("common.urls")),
     path("auth/", include("accounts.urls")),
