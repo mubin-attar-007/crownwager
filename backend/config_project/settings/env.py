@@ -43,6 +43,13 @@ class Settings(BaseSettings):
     # ── CORS (frontend origin) ─────────────────────────────────────
     cors_allowed_origins: str = "http://localhost:3000"
 
+    # ── Auth cookies (opt-in: JWT in HttpOnly cookies; frontend off localStorage) ──
+    # When true, login/register/refresh also set the JWT as HttpOnly cookies. Backward
+    # compatible — the Authorization: Bearer header still works. A cross-origin SPA needs
+    # samesite="None" (which requires Secure/HTTPS) so the cookie is sent on API calls.
+    auth_cookie_enabled: bool = False
+    auth_cookie_samesite: str = "Lax"
+
     # ── External services ──────────────────────────────────────────
     odds_api_key: str = ""
     odds_api_base_url: str = "https://api.the-odds-api.com/v4"
