@@ -62,3 +62,5 @@ services:
         sync: false
       - key: ADMIN_URL                # a hard-to-guess admin path, e.g. ops-7f3a9c/
         sync: false
+      - key: SENTRY_DSN               # Sentry error tracking (optional; no-op if unset)
+        sync: false

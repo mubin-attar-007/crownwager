@@ -10,6 +10,19 @@ from .env import env
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
+# ── Error tracking (Sentry; no-op unless SENTRY_DSN is set) ─────────
+if env.sentry_dsn:
+    import sentry_sdk
+    from sentry_sdk.integrations.django import DjangoIntegration
+
+    sentry_sdk.init(
+        dsn=env.sentry_dsn,
+        environment=env.django_env,
+        integrations=[DjangoIntegration()],
+        traces_sample_rate=0.1,
+        send_default_pii=False,
+    )
+
 # ── Security ───────────────────────────────────────────────────────
 SECRET_KEY = env.secret_key
 DEBUG = env.debug
