@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "CrownWager — sports-betting analytics & predictions API (Django + DRF)"
 requires-python = ">=3.12"
 dependencies = [
-    "Django>=5.1,<5.2",
+    "Django>=5.1,<6.1",
     "djangorestframework>=3.15",
     "djangorestframework-simplejwt>=5.3",
     "drf-spectacular>=0.27",
