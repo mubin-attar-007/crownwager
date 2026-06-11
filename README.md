@@ -12,6 +12,8 @@ pinned: false
 
 <!-- The YAML block above configures the Hugging Face Space (Docker). It renders as a small table on GitHub. -->
 
+**🔗 Live demo → [crownwager.vercel.app](https://crownwager.vercel.app)**  ·  API: [crownwager-backend.onrender.com](https://crownwager-backend.onrender.com/api/)
+
 A modern, full-stack sports-betting **analytics & predictions** platform (inspired by
 [dimers.com](https://www.dimers.com)): daily **+EV best bets**, **ML model predictions**, **live
 odds comparison**, **scores**, an **arbitrage finder**, **saved picks**, a multi-sport selector,
