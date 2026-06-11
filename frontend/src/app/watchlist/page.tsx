@@ -24,7 +24,7 @@ export default function WatchlistPage() {
       )}
       {!loading && !user && (
         <div className="mt-3">
-          <Link href="/login" className="btn-primary">Log in</Link>
+          <Link href="/login?next=/watchlist" className="btn-primary">Log in</Link>
         </div>
       )}
     </div>

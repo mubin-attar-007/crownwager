@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useAuth } from "@/lib/auth";
 import { api, ApiError } from "@/lib/api";
 import { Empty, Loading, SectionHeading, StatTile } from "@/components/ui";
+import { useToast } from "@/components/Toast";
 import { fmtOdds } from "@/lib/format";
 import type { BankrollStats, BetStatus, TrackedBet } from "@/lib/types";
 
@@ -39,12 +40,12 @@ const EMPTY_FORM = { selection: "", market: "moneyline", american_odds: "", stak
 
 export default function BankrollPage() {
   const { user, loading, refreshUser } = useAuth();
+  const { push: toast } = useToast();
   const [bankroll, setBankroll] = useState("1000.00");
   const [kelly, setKelly] = useState("0.50");
   const [stats, setStats] = useState<BankrollStats | null>(null);
   const [bets, setBets] = useState<TrackedBet[]>([]);
   const [form, setForm] = useState(EMPTY_FORM);
-  const [msg, setMsg] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     if (!user) return;
@@ -66,13 +67,12 @@ export default function BankrollPage() {
 
   async function saveSettings(e: React.FormEvent) {
     e.preventDefault();
-    setMsg(null);
     try {
       await api.patch("/auth/me/", { profile: { bankroll, kelly_fraction: kelly } });
       await refreshUser();
-      setMsg("Settings saved.");
+      toast("Settings saved");
     } catch (e) {
-      setMsg(e instanceof ApiError ? e.message : "Could not save.");
+      toast(e instanceof ApiError ? e.message : "Could not save.", "error");
     }
   }
 
@@ -85,18 +85,27 @@ export default function BankrollPage() {
       });
       setForm(EMPTY_FORM);
       await load();
+      toast("Bet logged");
     } catch {
-      setMsg("Could not log bet — check the odds (e.g. -110) and stake.");
+      toast("Could not log bet — check the odds (e.g. -110) and stake.", "error");
     }
   }
 
   async function settle(id: number, status: BetStatus) {
-    await api.patch(`/tracked-bets/${id}/`, { status });
-    await load();
+    try {
+      await api.patch(`/tracked-bets/${id}/`, { status });
+      await load();
+    } catch {
+      toast("Could not settle the bet — try again.", "error");
+    }
   }
   async function remove(id: number) {
-    await api.del(`/tracked-bets/${id}/`);
-    await load();
+    try {
+      await api.del(`/tracked-bets/${id}/`);
+      await load();
+    } catch {
+      toast("Could not remove the bet — try again.", "error");
+    }
   }
 
   if (loading) return <Loading />;
@@ -105,7 +114,7 @@ export default function BankrollPage() {
       <div>
         <SectionHeading eyebrow="Money management" title="Bankroll" />
         <Empty label="Log in to track your bets, ROI and bankroll." />
-        <Link href="/login" className="btn-primary mt-3 inline-flex">Log in</Link>
+        <Link href="/login?next=/bankroll" className="btn-primary mt-3 inline-flex">Log in</Link>
       </div>
     );
   }
@@ -137,15 +146,23 @@ export default function BankrollPage() {
               <input className="input" value={kelly} inputMode="decimal" onChange={(e) => setKelly(e.target.value)} />
             </div>
             <button className="btn-ghost w-full text-sm">Save settings</button>
-            {msg && <p className="text-center text-xs text-brand-300">{msg}</p>}
           </form>
 
           <form onSubmit={logBet} className="card space-y-3">
             <h3 className="font-bold text-white">Log a bet</h3>
-            <input className="input" placeholder="Selection (e.g. Lakers ML)" value={form.selection} onChange={(e) => setForm({ ...form, selection: e.target.value })} required />
+            <div>
+              <label className="label" htmlFor="bet-selection">Selection</label>
+              <input id="bet-selection" className="input" placeholder="e.g. Lakers ML" value={form.selection} onChange={(e) => setForm({ ...form, selection: e.target.value })} required />
+            </div>
             <div className="grid grid-cols-2 gap-2">
-              <input className="input" placeholder="Odds (-110)" value={form.american_odds} onChange={(e) => setForm({ ...form, american_odds: e.target.value })} required />
-              <input className="input" placeholder="Stake ($)" value={form.stake} inputMode="decimal" onChange={(e) => setForm({ ...form, stake: e.target.value })} required />
+              <div>
+                <label className="label" htmlFor="bet-odds">American odds</label>
+                <input id="bet-odds" className="input" placeholder="e.g. -110" value={form.american_odds} onChange={(e) => setForm({ ...form, american_odds: e.target.value })} required />
+              </div>
+              <div>
+                <label className="label" htmlFor="bet-stake">Stake ($)</label>
+                <input id="bet-stake" className="input" placeholder="e.g. 25.00" value={form.stake} inputMode="decimal" onChange={(e) => setForm({ ...form, stake: e.target.value })} required />
+              </div>
             </div>
             <button className="btn-primary w-full text-sm">Add bet</button>
           </form>

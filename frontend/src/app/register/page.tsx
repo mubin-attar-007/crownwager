@@ -1,16 +1,20 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth";
 import { ApiError } from "@/lib/api";
 import { LogoMark } from "@/components/Logo";
+import { Icon } from "@/components/icons";
 import { Spinner } from "@/components/ui";
 
-export default function RegisterPage() {
+function RegisterForm() {
   const { register } = useAuth();
   const router = useRouter();
+  const params = useSearchParams();
+  const next = params.get("next");
+  const dest = next && next.startsWith("/") && !next.startsWith("//") ? next : "/best-bets";
   const [form, setForm] = useState({ first_name: "", last_name: "", email: "", password: "" });
   const [agreed, setAgreed] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -30,7 +34,7 @@ export default function RegisterPage() {
     setError(null);
     try {
       await register(form);
-      router.push("/best-bets");
+      router.push(dest);
     } catch (err) {
       const msg =
         err instanceof ApiError
@@ -52,7 +56,12 @@ export default function RegisterPage() {
         <p className="mt-1 text-sm text-slate-400">Free — save picks and get bankroll-sized stakes.</p>
       </div>
       <form onSubmit={onSubmit} className="card space-y-4">
-        {error && <div className="rounded-xl bg-neg/15 p-3 text-sm text-neg">{error}</div>}
+        {error && (
+          <div role="alert" className="flex items-center gap-2 rounded-xl bg-neg/15 p-3 text-sm text-neg">
+            <Icon name="alert" size={16} className="shrink-0" />
+            {error}
+          </div>
+        )}
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="label">First name</label>
@@ -92,9 +101,23 @@ export default function RegisterPage() {
           {busy ? <><Spinner /> Creating…</> : "Sign up"}
         </button>
         <p className="text-center text-sm text-slate-400">
-          Already have an account? <Link href="/login" className="font-semibold text-brand-300">Log in</Link>
+          Already have an account?{" "}
+          <Link
+            href={next ? `/login?next=${encodeURIComponent(next)}` : "/login"}
+            className="font-semibold text-brand-300"
+          >
+            Log in
+          </Link>
         </p>
       </form>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={null}>
+      <RegisterForm />
+    </Suspense>
   );
 }

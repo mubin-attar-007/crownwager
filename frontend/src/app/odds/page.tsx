@@ -4,34 +4,8 @@ import { useState } from "react";
 import { useApi } from "@/lib/useApi";
 import SportSelector from "@/components/SportSelector";
 import { DemoBadge, Empty, ErrorState, LiveBadge, Loading, SectionHeading } from "@/components/ui";
-import type { OddsEvent, OddsResponse } from "@/lib/types";
-
-interface Matrix {
-  books: string[];
-  rows: { team: string; prices: Record<string, number>; best: number }[];
-}
-
-function toMatrix(ev: OddsEvent): Matrix {
-  const bookSet = new Set<string>();
-  const byTeam: Record<string, Record<string, number>> = {};
-  for (const bk of ev.bookmakers) {
-    for (const mk of bk.markets) {
-      if (mk.key !== "h2h") continue;
-      bookSet.add(bk.title);
-      for (const o of mk.outcomes) {
-        byTeam[o.name] = byTeam[o.name] || {};
-        byTeam[o.name][bk.title] = o.price;
-      }
-    }
-  }
-  const books = [...bookSet];
-  const rows = Object.entries(byTeam).map(([team, prices]) => ({
-    team,
-    prices,
-    best: Math.max(...Object.values(prices)),
-  }));
-  return { books, rows };
-}
+import { toMatrix } from "@/lib/odds";
+import type { OddsResponse } from "@/lib/types";
 
 export default function OddsPage() {
   const [sport, setSport] = useState("basketball_nba");
@@ -64,7 +38,43 @@ export default function OddsPage() {
                 <span className="font-semibold text-white">{ev.away_team} @ {ev.home_team}</span>
                 <span className="chip">{ev.sport_title}</span>
               </div>
-              <div className="overflow-x-auto">
+              {/* Mobile: stacked per-team price chips */}
+              <div className="space-y-4 p-4 sm:hidden">
+                {rows.map((r) => (
+                  <div key={r.team}>
+                    <div className="mb-1.5 flex items-center justify-between gap-2">
+                      <span className="font-medium text-white">{r.team}</span>
+                      <span className="flex items-center gap-1.5">
+                        <span className="rounded bg-brand-500/15 px-1.5 py-0.5 text-[0.6rem] font-bold uppercase tracking-wider text-brand-300">Best</span>
+                        <span className="font-extrabold gradient-text">{r.best.toFixed(2)}</span>
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {books.map((b) => {
+                        const p = r.prices[b];
+                        const isBest = p === r.best;
+                        return (
+                          <div
+                            key={b}
+                            className={`flex items-center justify-between gap-2 rounded-lg border px-2.5 py-1.5 text-xs ${
+                              isBest
+                                ? "border-brand-500/40 bg-brand-500/10 text-brand-300"
+                                : "border-white/10 bg-white/[0.03] text-slate-300"
+                            }`}
+                          >
+                            <span className="truncate text-slate-400">{b}</span>
+                            <span className={isBest ? "font-bold" : "font-medium"}>
+                              {p == null ? <span className="text-slate-600">—</span> : p.toFixed(2)}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {/* Desktop: full comparison table */}
+              <div className="hidden overflow-x-auto sm:block">
                 <table className="w-full min-w-[640px] text-sm">
                   <thead>
                     <tr className="text-left text-xs uppercase tracking-wider text-slate-500">

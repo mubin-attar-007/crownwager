@@ -28,6 +28,8 @@ const PATHS: Record<string, React.ReactNode> = {
   bell: (<><path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6" /><path d="M10 19a2 2 0 0 0 4 0" /></>),
   menu: (<><path d="M4 6h16M4 12h16M4 18h16" /></>),
   chevron: (<><path d="m9 6 6 6-6 6" /></>),
+  alert: (<><path d="M12 4 2.5 20h19L12 4Z" /><path d="M12 10v4M12 17.5h.01" /></>),
+  check: (<><path d="m5 13 4.5 4.5L19 7" /></>),
 };
 
 export function Icon({ name, className, size = 18 }: IconProps & { name: keyof typeof PATHS }) {

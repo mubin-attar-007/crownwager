@@ -19,10 +19,27 @@ export default function CrownBot() {
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    endRef.current?.scrollIntoView({ behavior: reduced ? "auto" : "smooth" });
   }, [msgs, busy]);
+
+  // On open: focus the message input; Escape closes and returns focus to the toggle.
+  useEffect(() => {
+    if (!open) return;
+    inputRef.current?.focus();
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        setOpen(false);
+        toggleRef.current?.focus();
+      }
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open]);
 
   async function send() {
     const text = input.trim();
@@ -51,21 +68,27 @@ export default function CrownBot() {
   return (
     <>
       <button
+        ref={toggleRef}
         onClick={() => setOpen((o) => !o)}
         aria-label="Open CrownBot assistant"
+        aria-expanded={open}
         className="group fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-full bg-brand-gradient px-5 py-3 font-bold text-ink-950 shadow-glow transition hover:brightness-110"
       >
         {open ? "✕ Close" : <><LogoMark size={20} /> CrownBot</>}
       </button>
 
       {open && (
-        <div className="fixed bottom-20 right-5 z-50 flex h-[30rem] w-[23rem] max-w-[92vw] flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-ink-850/95 shadow-lift backdrop-blur-xl">
+        <div
+          role="dialog"
+          aria-label="CrownBot assistant"
+          className="fixed bottom-20 right-5 z-50 flex h-[30rem] w-[23rem] max-w-[92vw] flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-ink-850/95 shadow-lift backdrop-blur-xl"
+        >
           <div className="flex items-center gap-2 border-b border-white/[0.06] px-4 py-3">
             <LogoMark size={22} />
             <div className="text-sm font-bold text-white">CrownBot</div>
             <span className="ml-auto chip">informational</span>
           </div>
-          <div className="flex-1 space-y-3 overflow-y-auto p-3">
+          <div aria-live="polite" className="flex-1 space-y-3 overflow-y-auto p-3">
             {msgs.map((m, i) => (
               <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
                 <div
@@ -94,6 +117,7 @@ export default function CrownBot() {
             className="flex gap-2 border-t border-white/[0.06] p-2.5"
           >
             <input
+              ref={inputRef}
               className="input"
               placeholder="Ask about today's edges…"
               value={input}

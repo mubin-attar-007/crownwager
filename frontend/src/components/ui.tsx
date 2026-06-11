@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Icon } from "@/components/icons";
 
 export { fmtOdds } from "@/lib/format";
 
@@ -136,8 +137,14 @@ export function Loading({ label = "Loading…" }: { label?: string }) {
 
 export function ErrorState({ message }: { message: string }) {
   return (
-    <div className="card border-neg/30 text-neg">
-      <strong>Couldn&apos;t load data.</strong> {message}
+    <div role="alert" className="card flex items-center gap-3 border-neg/30">
+      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-neg/10 text-neg">
+        <Icon name="alert" />
+      </span>
+      <p className="text-sm">
+        <strong className="text-neg">Couldn&apos;t load data.</strong>{" "}
+        <span className="text-slate-300">{message}</span>
+      </p>
     </div>
   );
 }

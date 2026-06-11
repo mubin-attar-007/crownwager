@@ -8,7 +8,16 @@ const ROUTES = ["", "/best-bets", "/predictions", "/odds", "/scores", "/arbitrag
 export default function sitemap(): MetadataRoute.Sitemap {
   return ROUTES.map((path) => ({
     url: `${SITE_URL}${path}`,
-    changeFrequency: path === "" ? "daily" : "hourly",
-    priority: path === "" ? 1 : 0.7,
+    lastModified: new Date(),
+    // Data pages change daily; evergreen content far less often.
+    changeFrequency: path === "/learn" ? "weekly" : ["/terms", "/privacy"].includes(path) ? "monthly" : "daily",
+    priority:
+      path === ""
+        ? 1
+        : ["/best-bets", "/predictions"].includes(path)
+          ? 0.9
+          : ["/terms", "/privacy"].includes(path)
+            ? 0.3
+            : 0.7,
   }));
 }

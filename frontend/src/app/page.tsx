@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LogoMark } from "@/components/Logo";
+import HeroPreview from "@/components/HeroPreview";
 
 const FEATURES = [
   { href: "/best-bets", icon: "🎯", title: "Best Bets", desc: "Our model's top +EV picks daily — ranked by edge, with EV and Kelly-sized stakes." },
@@ -25,27 +25,29 @@ export default function Home() {
   return (
     <div className="space-y-24">
       {/* Hero */}
-      <section className="relative overflow-hidden rounded-3xl border border-white/[0.06] bg-brand-radial px-6 py-20 text-center sm:py-28">
-        <div className="pointer-events-none absolute left-1/2 top-10 -z-10 h-40 w-40 -translate-x-1/2 animate-float opacity-60">
-          <LogoMark size={160} />
+      <section className="relative overflow-hidden rounded-3xl border border-white/[0.06] bg-brand-radial px-5 py-14 sm:px-8 sm:py-20 lg:py-24">
+        <div className="grid items-center gap-10 lg:grid-cols-2">
+          <div className="text-center lg:text-left">
+            <p className="eyebrow animate-fade-up">Data-driven sports betting analytics</p>
+            <h1 className="mx-auto mt-4 max-w-3xl text-4xl font-extrabold leading-[1.08] text-white animate-fade-up sm:text-6xl lg:mx-0">
+              Find the <span className="gradient-text">edge</span>.<br />Bet with numbers, not vibes.
+            </h1>
+            <p className="mx-auto mt-6 max-w-2xl text-base text-slate-300 animate-fade-up sm:text-lg lg:mx-0">
+              CrownWager compares our models&apos; true probabilities against sportsbook odds to surface
+              positive expected-value picks, predictions, and arbitrage — all in one place.
+            </p>
+            <div className="mt-9 flex flex-col gap-3 animate-fade-up sm:flex-row sm:justify-center lg:justify-start">
+              <Link href="/best-bets" className="btn-primary w-full px-6 py-3 text-base sm:w-auto">
+                See today&apos;s best bets →
+              </Link>
+              <Link href="/learn" className="btn-ghost w-full px-6 py-3 text-base sm:w-auto">
+                How it works
+              </Link>
+            </div>
+            <p className="mt-5 text-xs text-slate-500">Informational only · No real-money wagering · 18+</p>
+          </div>
+          <HeroPreview />
         </div>
-        <p className="eyebrow animate-fade-up">Data-driven sports betting analytics</p>
-        <h1 className="mx-auto mt-4 max-w-3xl text-4xl font-extrabold leading-[1.1] text-white animate-fade-up sm:text-6xl">
-          Find the <span className="gradient-text">edge</span>.<br />Bet with numbers, not vibes.
-        </h1>
-        <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-300 animate-fade-up">
-          CrownWager compares our models&apos; true probabilities against sportsbook odds to surface
-          positive expected-value picks, predictions, and arbitrage — all in one place.
-        </p>
-        <div className="mt-9 flex flex-wrap justify-center gap-3 animate-fade-up">
-          <Link href="/best-bets" className="btn-primary px-6 py-3 text-base">
-            See today&apos;s best bets →
-          </Link>
-          <Link href="/learn" className="btn-ghost px-6 py-3 text-base">
-            How it works
-          </Link>
-        </div>
-        <p className="mt-5 text-xs text-slate-500">Informational only · No real-money wagering · 18+</p>
       </section>
 
       {/* Stat band */}

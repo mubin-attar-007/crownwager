@@ -1,7 +1,8 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Sora } from "next/font/google";
 import "./globals.css";
 import Shell from "@/components/Shell";
+import { ToastProvider } from "@/components/Toast";
 import { AuthProvider } from "@/lib/auth";
 import SentryInit from "./sentry-init";
 
@@ -32,6 +33,8 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
+export const viewport: Viewport = { themeColor: "#05080f" };
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${inter.variable} ${sora.variable}`}>
@@ -41,7 +44,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <div className="pointer-events-none fixed inset-0 -z-10 bg-mesh" aria-hidden />
         <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_50%_-10%,rgba(16,185,129,0.08),transparent_45%)]" aria-hidden />
         <AuthProvider>
-          <Shell>{children}</Shell>
+          <ToastProvider>
+            <Shell>{children}</Shell>
+          </ToastProvider>
         </AuthProvider>
       </body>
     </html>

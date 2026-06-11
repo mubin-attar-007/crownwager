@@ -5,19 +5,20 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { api, ApiError } from "@/lib/api";
 import { Loading } from "@/components/ui";
+import { useToast } from "@/components/Toast";
 import SavedBets from "@/components/SavedBets";
 
 export default function ProfilePage() {
   const { user, loading, refreshUser } = useAuth();
   const router = useRouter();
+  const { push: toast } = useToast();
   const [bankroll, setBankroll] = useState("1000.00");
   const [kelly, setKelly] = useState("0.50");
   const [favorite, setFavorite] = useState("basketball_nba");
-  const [msg, setMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (!loading && !user) router.push("/login");
+    if (!loading && !user) router.push("/login?next=/profile");
     if (user) {
       setBankroll(user.profile.bankroll);
       setKelly(user.profile.kelly_fraction);
@@ -30,15 +31,14 @@ export default function ProfilePage() {
   async function save(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
-    setMsg(null);
     try {
       await api.patch("/auth/me/", {
         profile: { bankroll, kelly_fraction: kelly, favorite_sport: favorite },
       });
       await refreshUser();
-      setMsg("Saved.");
+      toast("Settings saved");
     } catch (e) {
-      setMsg(e instanceof ApiError ? e.message : "Could not save.");
+      toast(e instanceof ApiError ? e.message : "Could not save.", "error");
     } finally {
       setBusy(false);
     }
@@ -82,7 +82,6 @@ export default function ProfilePage() {
         <button className="btn-primary w-full" disabled={busy}>
           {busy ? "Saving…" : "Save settings"}
         </button>
-        {msg && <p className="text-center text-sm text-brand-300">{msg}</p>}
       </form>
 
       <section className="mt-8">
