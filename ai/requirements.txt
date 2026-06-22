@@ -1,12 +1,12 @@
 # AI prediction service. Python 3.12.
-fastapi>=0.136.3,<0.137
+fastapi>=0.138.0,<0.139
 uvicorn[standard]>=0.49.0
 pydantic>=2.13.4,<3
-numpy>=2.4.6
+numpy>=2.5.0
 PyYAML>=6.0.3
 # Plug-in model stack (used by training/eval scripts and optional model loading):
 scikit-learn>=1.9.0
-xgboost>=3.2.0
+xgboost>=3.3.0
 # Dev/test
-pytest>=9.0.3
+pytest>=9.1.1
 httpx>=0.28.1
