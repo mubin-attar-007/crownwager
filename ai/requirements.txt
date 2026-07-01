@@ -6,7 +6,7 @@ numpy>=2.4.6
 PyYAML>=6.0.3
 # Plug-in model stack (used by training/eval scripts and optional model loading):
 scikit-learn>=1.9.0
-xgboost>=3.2.0
+xgboost>=3.3.0
 # Dev/test
 pytest>=9.0.3
 httpx>=0.28.1
