@@ -85,7 +85,10 @@ class Settings(BaseSettings):
 
     @property
     def cors_origins_list(self) -> list[str]:
-        return [o.strip() for o in self.cors_allowed_origins.split(",") if o.strip()]
+        # django-cors-headers rejects origins that carry a path/trailing slash
+        # (system check corsheaders.E014), so normalize each entry to a bare
+        # scheme://host[:port] with no trailing slash.
+        return [o.strip().rstrip("/") for o in self.cors_allowed_origins.split(",") if o.strip()]
 
     @property
     def is_prod(self) -> bool:
