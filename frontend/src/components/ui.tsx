@@ -68,6 +68,42 @@ export function EdgeMeter({ value }: { value: number | string }) {
   );
 }
 
+/** Bucketed model-confidence grade. Green A/B (value), amber C, red D/F. */
+export function GradeBadge({ grade }: { grade: "A" | "B" | "C" | "D" | "F" }) {
+  const tone =
+    grade === "A" || grade === "B"
+      ? "bg-pos/15 text-pos"
+      : grade === "C"
+        ? "bg-warn/15 text-warn"
+        : "bg-neg/15 text-neg";
+  return (
+    <span className={`badge ${tone}`} title="Model confidence grade">
+      Grade {grade}
+    </span>
+  );
+}
+
+/** Hover/focus info popover — used to expose the edge math and model provenance. */
+export function InfoTip({ children, label = "How this is computed" }: { children: ReactNode; label?: string }) {
+  return (
+    <span className="group relative inline-flex align-middle">
+      <button
+        type="button"
+        aria-label={label}
+        className="grid h-4 w-4 place-items-center rounded-full border border-white/20 text-[10px] font-semibold text-slate-400 transition-colors hover:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
+      >
+        i
+      </button>
+      <span
+        role="tooltip"
+        className="pointer-events-none absolute bottom-full left-1/2 z-30 mb-2 w-64 -translate-x-1/2 rounded-lg border border-white/10 bg-slate-900 p-3 text-left text-xs font-normal leading-relaxed text-slate-300 opacity-0 shadow-xl transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100"
+      >
+        {children}
+      </span>
+    </span>
+  );
+}
+
 export function StatTile({ label, value, sub }: { label: string; value: ReactNode; sub?: ReactNode }) {
   return (
     <div className="card">
