@@ -8,11 +8,31 @@ app_port: 7860
 pinned: false
 ---
 
-# CrownWager — Data-Driven Sports Betting Analytics
+<div align="center">
 
-<!-- The YAML block above configures the Hugging Face Space (Docker). It renders as a small table on GitHub. -->
+# 👑 CrownWager
 
-**🔗 Live demo → [crownwager.vercel.app](https://crownwager.vercel.app)**  ·  API: [crownwager-backend.onrender.com](https://crownwager-backend.onrender.com/api/)
+### Data-driven sports-betting **analytics & predictions** (à la dimers.com).
+
+Daily **+EV best bets**, an **XGBoost ML model** (NBA moneyline), **live odds comparison**, scores,
+an **arbitrage finder**, saved picks, and **CrownBot** — a Claude-powered assistant grounded in the
+current best bets.
+
+[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-online-16a34a?style=for-the-badge)](https://crownwager.vercel.app)
+
+![Django](https://img.shields.io/badge/Django-5.1_+_DRF-092E20?logo=django&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-ML_service-009688?logo=fastapi&logoColor=white)
+![XGBoost](https://img.shields.io/badge/XGBoost-65%25_CV-EB5E28)
+![Next.js](https://img.shields.io/badge/Next.js_15-React_19-000000?logo=next.js&logoColor=white)
+![Celery](https://img.shields.io/badge/Celery_+_Redis-37814A?logo=celery&logoColor=white)
+
+<br/>
+
+<img src="docs/assets/screenshot.png" alt="CrownWager — sports betting analytics" width="100%"/>
+
+</div>
+
+---
 
 A modern, full-stack sports-betting **analytics & predictions** platform (inspired by
 [dimers.com](https://www.dimers.com)): daily **+EV best bets**, **ML model predictions**, **live
