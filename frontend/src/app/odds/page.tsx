@@ -114,15 +114,6 @@ export default function OddsPage() {
           );
         })}
       </div>
-
-      {/* Pro placeholder, line shopping power-user signal */}
-      <div className="mt-4 card flex items-center justify-between">
-        <div>
-          <h3 className="font-bold text-white">Sharp money &amp; line movement</h3>
-          <p className="text-sm text-slate-400">No-vig fair odds, steam moves, and public betting % — coming with a Pro data feed.</p>
-        </div>
-        <span className="chip">Pro · soon</span>
-      </div>
     </div>
   );
 }

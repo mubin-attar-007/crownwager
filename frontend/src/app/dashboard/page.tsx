@@ -78,16 +78,16 @@ export default function DashboardPage() {
               <Link href="/bankroll" className="text-xs font-semibold text-brand-300">Manage →</Link>
             </div>
             <div className="text-2xl font-extrabold gradient-text font-display">${data?.bankroll ?? "1,000"}</div>
-            <div className="mt-1 text-xs text-slate-500">Half-Kelly staking · ROI tracking coming soon</div>
+            <div className="mt-1 text-xs text-slate-500">Half-Kelly staking · ROI tracked from your settled bets</div>
           </div>
 
-          <div className="card">
+          <Link href="/arbitrage" className="card card-hover block">
             <div className="flex items-center justify-between">
-              <h3 className="font-bold text-white">Market movers</h3>
-              <span className="chip">Pro · soon</span>
+              <h3 className="font-bold text-white">Arbitrage finder</h3>
+              <span className="text-xs font-semibold text-brand-300">Open →</span>
             </div>
-            <p className="mt-2 text-sm text-slate-400">Biggest line moves across books. Coming with line-history data.</p>
-          </div>
+            <p className="mt-2 text-sm text-slate-400">Guaranteed-profit opportunities across books, with exact stake splits.</p>
+          </Link>
         </div>
       </div>
     </div>

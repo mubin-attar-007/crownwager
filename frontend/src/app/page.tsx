@@ -3,15 +3,15 @@ import HeroPreview from "@/components/HeroPreview";
 
 const FEATURES = [
   { href: "/best-bets", icon: "🎯", title: "Best Bets", desc: "Our model's top +EV picks daily — ranked by edge, with EV and Kelly-sized stakes." },
-  { href: "/predictions", icon: "🧠", title: "Model Predictions", desc: "Win probabilities from neural-net, XGBoost, and ensemble models for every game." },
+  { href: "/predictions", icon: "🧠", title: "Model Predictions", desc: "Win probabilities from our validated gradient-boosted model, lined up against the market's implied odds." },
   { href: "/odds", icon: "📊", title: "Odds Comparison", desc: "Compare live moneyline odds across sportsbooks and always get the best price." },
   { href: "/arbitrage", icon: "♻️", title: "Arbitrage Finder", desc: "Spot guaranteed-profit opportunities across books, with exact stake splits." },
 ];
 
 const STATS = [
-  { value: "100K+", label: "data points / sport" },
+  { value: "65%", label: "model CV accuracy" },
   { value: "+EV", label: "every surfaced pick" },
-  { value: "5", label: "ML signals per game" },
+  { value: "3,023", label: "games trained on" },
   { value: "0", label: "real-money risk" },
 ];
 
@@ -33,7 +33,7 @@ export default function Home() {
               Find the <span className="gradient-text">edge</span>.<br />Bet with numbers, not vibes.
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-base text-slate-300 animate-fade-up sm:text-lg lg:mx-0">
-              CrownWager compares our models&apos; true probabilities against sportsbook odds to surface
+              CrownWager compares our model&apos;s true probabilities against sportsbook odds to surface
               positive expected-value picks, predictions, and arbitrage — all in one place.
             </p>
             <div className="mt-9 flex flex-col gap-3 animate-fade-up sm:flex-row sm:justify-center lg:justify-start">

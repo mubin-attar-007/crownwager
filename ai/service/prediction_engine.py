@@ -1,9 +1,9 @@
 """Prediction engine: turns game inputs into win probabilities and per-market picks.
 
-Produces moneyline (home/away) and over/under probabilities. Emits an `ensemble` pick (used by the
-backend's best-bets ranking) plus per-model entries (`nn`, `xgboost`) for display richness. The
-per-model entries are deterministic perturbations of the baseline so the demo is stable and
-reproducible (no randomness). When a validated model is registered, swap it in here.
+Produces moneyline (home/away) and over/under probabilities, emitting exactly one pick per market
+(``model_name="ensemble"`` — the canonical key the backend's best-bets ranking consumes). The
+probability is the validated XGBoost model's output when it and both teams are available, and a
+transparent logistic baseline otherwise. No fabricated multi-model split: one model, one number.
 """
 from __future__ import annotations
 
@@ -88,19 +88,6 @@ def predict_game(game: GameIn, model: ModelInfo) -> GamePrediction:
                 pick=offer.selection,
                 win_probability=prob,
                 confidence=round(abs(prob - 0.5) * 2, 4),
-            )
-        )
-        # Deterministic per-model variants for display (xgboost slightly sharper, nn slightly softer).
-        models.append(
-            ModelPick(
-                model_name="xgboost", market=market, pick=offer.selection,
-                win_probability=round(_clamp(prob + 0.015), 4), confidence=round(abs(prob - 0.5) * 2, 4),
-            )
-        )
-        models.append(
-            ModelPick(
-                model_name="nn", market=market, pick=offer.selection,
-                win_probability=round(_clamp(prob - 0.015), 4), confidence=round(abs(prob - 0.5) * 2, 4),
             )
         )
 
