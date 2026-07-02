@@ -9,6 +9,7 @@ import { useAuth } from "@/lib/auth";
 const NAV: { href: string; label: string; icon: IconName }[] = [
   { href: "/dashboard", label: "Dashboard", icon: "dashboard" },
   { href: "/best-bets", label: "Best Bets", icon: "target" },
+  { href: "/model-record", label: "Model Record", icon: "record" },
   { href: "/predictions", label: "Predictions", icon: "brain" },
   { href: "/odds", label: "Odds Intelligence", icon: "table" },
   { href: "/arbitrage", label: "Arbitrage", icon: "swap" },

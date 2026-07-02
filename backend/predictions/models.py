@@ -69,6 +69,13 @@ class ModelPrediction(models.Model):
 class BestBet(models.Model):
     """A surfaced +EV pick: model probability compared to a sportsbook's price."""
 
+    class Result(models.TextChoices):
+        PENDING = "pending", "Pending"
+        WON = "won", "Won"
+        LOST = "lost", "Lost"
+        PUSH = "push", "Push"
+        VOID = "void", "Void"  # ungradeable (unknown selection / no line)
+
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="best_bets")
     market = models.CharField(max_length=10, choices=ModelPrediction.Market.choices)
     selection = models.CharField(max_length=80)
@@ -81,11 +88,21 @@ class BestBet(models.Model):
     kelly_fraction = models.DecimalField(max_digits=6, decimal_places=4)
     confidence = models.DecimalField(max_digits=5, decimal_places=4, default=0)
     is_published = models.BooleanField(default=True, db_index=True)
+    # Settlement — populated by the ``settle_bestbets`` command from the FINAL game score. A pick
+    # is graded only once its game is final; the model's track record is computed from these real
+    # outcomes and never fabricated or backfilled.
+    result = models.CharField(
+        max_length=8, choices=Result.choices, default=Result.PENDING, db_index=True
+    )
+    settled_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ["-edge_pct"]
-        indexes = [models.Index(fields=["is_published", "-edge_pct"])]
+        indexes = [
+            models.Index(fields=["is_published", "-edge_pct"]),
+            models.Index(fields=["is_published", "result"]),
+        ]
 
     def __str__(self) -> str:
         return f"{self.selection} @ {self.american_odds} (edge {self.edge_pct}%)"

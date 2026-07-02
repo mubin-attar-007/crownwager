@@ -4,11 +4,19 @@ import { useState } from "react";
 import { useApi } from "@/lib/useApi";
 import SportSelector from "@/components/SportSelector";
 import { DemoBadge, Empty, ErrorState, LiveBadge, Loading, ProbBar, SectionHeading } from "@/components/ui";
+import { gradeFromConfidence } from "@/lib/edge";
 import type { PredictionsResponse } from "@/lib/types";
 
 const MODEL_LABELS: Record<string, string> = {
   ensemble: "Model pick",
 };
+
+function gradeClass(g: string): string {
+  if (g === "A") return "bg-emerald-500/15 text-emerald-300";
+  if (g === "B") return "bg-brand-500/15 text-brand-300";
+  if (g === "C") return "bg-slate-500/15 text-slate-300";
+  return "bg-slate-600/20 text-slate-400";
+}
 
 export default function PredictionsPage() {
   const [sport, setSport] = useState("basketball_nba");
@@ -55,7 +63,15 @@ export default function PredictionsPage() {
                     <span className="badge bg-brand-500/10 text-brand-300">
                       {m.model_label || MODEL_LABELS[m.model_name] || m.model_name}
                     </span>
-                    <span className="text-xs text-slate-500">{m.market}</span>
+                    <span className="flex items-center gap-1.5">
+                      <span className="text-xs text-slate-500">{m.market}</span>
+                      <span
+                        title="Model confidence grade"
+                        className={`rounded px-1.5 py-0.5 text-[0.65rem] font-bold ${gradeClass(gradeFromConfidence(Number(m.confidence)))}`}
+                      >
+                        {gradeFromConfidence(Number(m.confidence))}
+                      </span>
+                    </span>
                   </div>
                   <div className="mt-2 text-sm font-semibold text-white">{m.pick}</div>
                   <div className="mt-3">

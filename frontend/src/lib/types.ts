@@ -189,6 +189,34 @@ export interface BankrollStats {
   growth: { at: string; cumulative_profit: string }[];
 }
 
+export interface RecordSummary {
+  n: number;
+  wins: number;
+  losses: number;
+  pushes: number;
+  record: string;
+  win_rate_pct: string;
+  units_profit: string;
+  units_staked: string;
+  roi_pct: string;
+}
+
+export interface EdgeTierRecord extends RecordSummary {
+  label: string;
+}
+
+export interface ModelRecord {
+  sport: string | null;
+  settled_count: number;
+  pending_count: number;
+  insufficient: boolean;
+  min_sample: number;
+  overall: RecordSummary;
+  by_edge_tier: EdgeTierRecord[];
+  last_settled_at: string | null;
+  disclaimer: string;
+}
+
 export interface Paginated<T> {
   count: number;
   next: string | null;

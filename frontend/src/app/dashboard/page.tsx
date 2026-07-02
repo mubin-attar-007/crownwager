@@ -81,6 +81,14 @@ export default function DashboardPage() {
             <div className="mt-1 text-xs text-slate-500">Half-Kelly staking · ROI tracked from your settled bets</div>
           </div>
 
+          <Link href="/model-record" className="card card-hover block">
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold text-white">Model record</h3>
+              <span className="text-xs font-semibold text-brand-300">View →</span>
+            </div>
+            <p className="mt-2 text-sm text-slate-400">How published picks have actually done — graded against final scores.</p>
+          </Link>
+
           <Link href="/arbitrage" className="card card-hover block">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-white">Arbitrage finder</h3>

@@ -23,6 +23,7 @@ from .models import BestBet, Game, SavedBet, TrackedBet
 from .serializers import GameSerializer, SavedBetSerializer, TrackedBetSerializer, bestbet_to_dict
 from .services.best_bets import compute_best_bets
 from .services.pipeline import gather_predictions
+from .services.record import compute_model_record
 from .services.staking import bet_profit, recommended_stake
 
 DISCLAIMER = "Informational only. Not financial advice. 18+. Please bet responsibly."
@@ -111,6 +112,23 @@ class BestBetsView(APIView):
                 "disclaimer": DISCLAIMER,
             }
         )
+
+
+class ModelRecordView(APIView):
+    """The model's realized, verifiable track record: win rate by edge tier, units P&L, ROI and
+    sample size — computed only from published picks graded against final scores. Empty (all zeros,
+    ``insufficient=true``) until picks settle; never a fabricated record."""
+
+    permission_classes = [AllowAny]
+
+    @extend_schema(
+        parameters=[OpenApiParameter("sport", str, required=False)],
+        description="Realized model track record from settled BestBets. Empty until picks settle.",
+    )
+    def get(self, request: Request) -> Response:
+        raw = request.query_params.get("sport")
+        sport = clean_sport(raw) if raw else None
+        return Response(compute_model_record(sport))
 
 
 class SavedBetViewSet(viewsets.ModelViewSet):

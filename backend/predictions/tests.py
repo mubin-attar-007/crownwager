@@ -189,6 +189,95 @@ def test_bet_tracking_and_bankroll_stats(client: APIClient) -> None:
     assert len(stats["growth"]) == 2
 
 
+# ── Model track record (grade settled picks off final scores) ─────
+def _final_game(**kw):
+    from django.utils import timezone
+
+    from predictions.models import Game
+
+    defaults = dict(
+        external_id="g-final", sport_key="basketball_nba", home_team="Lakers",
+        away_team="Celtics", commence_time=timezone.now(), status=Game.Status.FINAL,
+        home_score=110, away_score=100,
+    )
+    defaults.update(kw)
+    return Game.objects.create(**defaults)
+
+
+def _bestbet(game, **kw):
+    from predictions.models import BestBet
+
+    defaults = dict(
+        market="moneyline", selection="Lakers", bookmaker="DK", american_odds=100,
+        decimal_odds="2.000", model_probability="0.60", edge_pct="6.00",
+        expected_value="20.00", kelly_fraction="0.1",
+    )
+    defaults.update(kw)
+    return BestBet.objects.create(game=game, **defaults)
+
+
+@pytest.mark.django_db
+def test_model_record_empty_when_nothing_settled(client: APIClient) -> None:
+    resp = client.get("/api/model-record/?sport=basketball_nba")
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["settled_count"] == 0
+    assert body["insufficient"] is True
+    assert body["overall"]["record"] == "0-0-0"
+    assert len(body["by_edge_tier"]) == 4
+
+
+@pytest.mark.django_db
+def test_grade_moneyline_and_void() -> None:
+    from predictions.services.grading import grade_bestbet
+
+    g = _final_game(home_score=110, away_score=100)  # Lakers win
+    assert grade_bestbet(_bestbet(g, selection="Lakers")) == "won"
+    assert grade_bestbet(_bestbet(g, selection="Celtics")) == "lost"
+    assert grade_bestbet(_bestbet(g, selection="Phoenix Suns")) == "void"  # not in this game
+
+
+@pytest.mark.django_db
+def test_grade_total_over_under() -> None:
+    from predictions.services.grading import grade_bestbet
+
+    g = _final_game(home_score=120, away_score=110)  # total 230
+    assert grade_bestbet(_bestbet(g, market="total", selection="Over 220.5")) == "won"
+    assert grade_bestbet(_bestbet(g, market="total", selection="Under 220.5")) == "lost"
+    assert grade_bestbet(_bestbet(g, market="total", selection="Over 230")) == "push"  # exact line
+    assert grade_bestbet(_bestbet(g, market="total", selection="Over")) == "void"  # no line
+
+
+@pytest.mark.django_db
+def test_settle_command_and_record_math(client: APIClient) -> None:
+    from django.core.management import call_command
+
+    from predictions.models import BestBet
+
+    g = _final_game(home_score=110, away_score=100)
+    won = _bestbet(g, selection="Lakers", american_odds=100, edge_pct="6.00")   # +100 → +1u
+    lost = _bestbet(g, selection="Celtics", american_odds=-110, edge_pct="3.00")
+
+    call_command("settle_bestbets")
+    won.refresh_from_db()
+    lost.refresh_from_db()
+    assert won.result == "won" and won.settled_at is not None
+    assert lost.result == "lost"
+
+    body = client.get("/api/model-record/?sport=basketball_nba").json()
+    assert body["settled_count"] == 2
+    assert body["overall"]["record"] == "1-1-0"
+    assert body["overall"]["win_rate_pct"] == "50.00"
+    assert body["overall"]["units_profit"] == "0.00"  # +1u (won at +100) and -1u
+    tiers = {t["label"]: t for t in body["by_edge_tier"]}
+    assert tiers["5–10%"]["wins"] == 1   # 6% edge bucket
+    assert tiers["2–5%"]["losses"] == 1  # 3% edge bucket
+
+    # Idempotent: re-running settles nothing new.
+    call_command("settle_bestbets")
+    assert BestBet.objects.filter(result="won").count() == 1
+
+
 def test_games_from_odds_builds_moneyline_offer() -> None:
     from predictions.services.pipeline import games_from_odds
 

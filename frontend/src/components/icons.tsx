@@ -30,6 +30,7 @@ const PATHS: Record<string, React.ReactNode> = {
   chevron: (<><path d="m9 6 6 6-6 6" /></>),
   alert: (<><path d="M12 4 2.5 20h19L12 4Z" /><path d="M12 10v4M12 17.5h.01" /></>),
   check: (<><path d="m5 13 4.5 4.5L19 7" /></>),
+  record: (<><path d="M4 4v16h16" /><path d="M7 14l3.5-3.5 3 3L20 7" /></>),
 };
 
 export function Icon({ name, className, size = 18 }: IconProps & { name: keyof typeof PATHS }) {
