@@ -7,6 +7,7 @@ import { api, ApiError } from "@/lib/api";
 import { Loading } from "@/components/ui";
 import { useToast } from "@/components/Toast";
 import SavedBets from "@/components/SavedBets";
+import { AccountSecurity } from "@/components/AccountSecurity";
 
 export default function ProfilePage() {
   const { user, loading, refreshUser } = useAuth();
@@ -88,6 +89,8 @@ export default function ProfilePage() {
         <h2 className="mb-3 text-lg font-bold">Saved picks</h2>
         <SavedBets />
       </section>
+
+      <AccountSecurity />
     </div>
   );
 }

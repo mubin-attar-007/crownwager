@@ -8,6 +8,7 @@ import { ApiError } from "@/lib/api";
 import { LogoMark } from "@/components/Logo";
 import { Icon } from "@/components/icons";
 import { Spinner } from "@/components/ui";
+import { PasswordInput } from "@/components/PasswordInput";
 
 function RegisterForm() {
   const { register } = useAuth();
@@ -16,6 +17,7 @@ function RegisterForm() {
   const next = params.get("next");
   const dest = next && next.startsWith("/") && !next.startsWith("//") ? next : "/best-bets";
   const [form, setForm] = useState({ first_name: "", last_name: "", email: "", password: "" });
+  const [confirm, setConfirm] = useState("");
   const [agreed, setAgreed] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -28,6 +30,10 @@ function RegisterForm() {
     e.preventDefault();
     if (!agreed) {
       setError("You must confirm you are 18+ and agree to the Terms & Privacy Policy.");
+      return;
+    }
+    if (form.password !== confirm) {
+      setError("Passwords don't match.");
       return;
     }
     setBusy(true);
@@ -77,10 +83,32 @@ function RegisterForm() {
           <input type="email" className="input" value={form.email} onChange={set("email")} required />
         </div>
         <div>
-          <label className="label">Password</label>
-          <input type="password" className="input" value={form.password} onChange={set("password")}
-            minLength={8} required />
-          <p className="mt-1.5 text-xs text-slate-500">At least 8 characters.</p>
+          <label className="label" htmlFor="pw">Password</label>
+          <PasswordInput
+            id="pw"
+            value={form.password}
+            onChange={(v) => setForm({ ...form, password: v })}
+            autoComplete="new-password"
+            minLength={8}
+            required
+            describedBy="pw-hint"
+          />
+          <p id="pw-hint" className="mt-1.5 text-xs text-slate-500">
+            At least 8 characters — avoid common or all-numeric passwords.
+          </p>
+        </div>
+        <div>
+          <label className="label" htmlFor="pw2">Confirm password</label>
+          <PasswordInput
+            id="pw2"
+            value={confirm}
+            onChange={setConfirm}
+            autoComplete="new-password"
+            required
+          />
+          {confirm && form.password !== confirm && (
+            <p className="mt-1.5 text-xs text-neg">Passwords don&apos;t match.</p>
+          )}
         </div>
         <label className="flex items-start gap-2 text-xs text-slate-400">
           <input

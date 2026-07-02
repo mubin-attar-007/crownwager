@@ -3,6 +3,9 @@ from __future__ import annotations
 
 import pytest
 from django.contrib.auth.models import User
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 from rest_framework.test import APIClient
 
 from .models import Profile
@@ -62,3 +65,79 @@ def test_me_returns_profile_when_authenticated(client: APIClient) -> None:
     assert resp.status_code == 200
     assert resp.json()["email"] == "me@example.com"
     assert "profile" in resp.json()
+
+
+@pytest.mark.django_db
+def test_change_password(client: APIClient) -> None:
+    user = User.objects.create_user(
+        username="c@example.com", email="c@example.com", password="Old-pass-123"
+    )
+    client.force_authenticate(user=user)
+    # Wrong current password is rejected.
+    bad = client.post(
+        "/api/auth/change-password/",
+        {"old_password": "wrong", "new_password": "New-pass-456"},
+        format="json",
+    )
+    assert bad.status_code == 400
+    # Correct current password succeeds and the new one takes effect.
+    ok = client.post(
+        "/api/auth/change-password/",
+        {"old_password": "Old-pass-123", "new_password": "New-pass-456"},
+        format="json",
+    )
+    assert ok.status_code == 200
+    user.refresh_from_db()
+    assert user.check_password("New-pass-456")
+
+
+@pytest.mark.django_db
+def test_delete_account_requires_password(client: APIClient) -> None:
+    user = User.objects.create_user(
+        username="d@example.com", email="d@example.com", password="Del-pass-123"
+    )
+    client.force_authenticate(user=user)
+    assert (
+        client.post("/api/auth/delete/", {"password": "wrong"}, format="json").status_code == 400
+    )
+    ok = client.post("/api/auth/delete/", {"password": "Del-pass-123"}, format="json")
+    assert ok.status_code == 204
+    assert not User.objects.filter(pk=user.pk).exists()
+
+
+@pytest.mark.django_db
+def test_password_reset_flow(client: APIClient) -> None:
+    user = User.objects.create_user(
+        username="r@example.com", email="r@example.com", password="Reset-me-123"
+    )
+    # Generic 200 even for an unknown email (no account enumeration).
+    assert (
+        client.post(
+            "/api/auth/password-reset/", {"email": "nobody@example.com"}, format="json"
+        ).status_code
+        == 200
+    )
+    assert (
+        client.post(
+            "/api/auth/password-reset/", {"email": "r@example.com"}, format="json"
+        ).status_code
+        == 200
+    )
+    uid = urlsafe_base64_encode(force_bytes(user.pk))
+    token = default_token_generator.make_token(user)
+    # A bad token is rejected.
+    bad = client.post(
+        "/api/auth/password-reset-confirm/",
+        {"uid": uid, "token": "bad-token", "new_password": "Fresh-pass-999"},
+        format="json",
+    )
+    assert bad.status_code == 400
+    # A valid token resets the password.
+    ok = client.post(
+        "/api/auth/password-reset-confirm/",
+        {"uid": uid, "token": token, "new_password": "Fresh-pass-999"},
+        format="json",
+    )
+    assert ok.status_code == 200
+    user.refresh_from_db()
+    assert user.check_password("Fresh-pass-999")

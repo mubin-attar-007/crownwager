@@ -8,6 +8,7 @@ import { ApiError } from "@/lib/api";
 import { LogoMark } from "@/components/Logo";
 import { Icon } from "@/components/icons";
 import { Spinner } from "@/components/ui";
+import { PasswordInput } from "@/components/PasswordInput";
 
 function LoginForm() {
   const { login } = useAuth();
@@ -54,9 +55,22 @@ function LoginForm() {
             onChange={(e) => setEmail(e.target.value)} required />
         </div>
         <div>
-          <label className="label" htmlFor="pw">Password</label>
-          <input id="pw" type="password" className="input" value={password}
-            onChange={(e) => setPassword(e.target.value)} required />
+          <div className="flex items-center justify-between">
+            <label className="label" htmlFor="pw">Password</label>
+            <Link
+              href="/forgot-password"
+              className="mb-1.5 text-xs font-semibold text-brand-300 hover:text-brand-200"
+            >
+              Forgot password?
+            </Link>
+          </div>
+          <PasswordInput
+            id="pw"
+            value={password}
+            onChange={setPassword}
+            autoComplete="current-password"
+            required
+          />
         </div>
         <button className="btn-primary w-full" disabled={busy}>
           {busy ? <><Spinner /> Logging in…</> : "Log in"}

@@ -144,8 +144,14 @@ REST_FRAMEWORK = {
         "rest_framework.throttling.AnonRateThrottle",
         "rest_framework.throttling.UserRateThrottle",
     ),
-    # `assistant` is a strict scope for the LLM-backed CrownBot endpoint (cost/abuse control).
-    "DEFAULT_THROTTLE_RATES": {"anon": "60/min", "user": "240/min", "assistant": "10/min"},
+    # `assistant` = strict scope for the LLM CrownBot; `auth` = tighter cap on credential
+    # endpoints (login/register/password-reset) to blunt brute force.
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "60/min",
+        "user": "240/min",
+        "assistant": "10/min",
+        "auth": "10/min",
+    },
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 25,
     # Trust N front proxies so per-IP throttling uses the real client IP (X-Forwarded-For),
@@ -171,6 +177,11 @@ AUTH_REFRESH_COOKIE = "cw_refresh"
 AUTH_COOKIE_SAMESITE = env.auth_cookie_samesite  # "Lax" same-origin; "None" cross-origin (+ Secure)
 AUTH_COOKIE_SECURE = False  # overridden to True in prod.py
 AUTH_COOKIE_PATH = "/"
+
+# Base URL of the deployed frontend — used to build links in transactional email (password reset).
+FRONTEND_URL = env.frontend_url
+# From-address for transactional email; falls back to the SMTP user, then a safe default.
+DEFAULT_FROM_EMAIL = env.default_from_email or env.email_host_user or "no-reply@crownwager.app"
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "CrownWager API",

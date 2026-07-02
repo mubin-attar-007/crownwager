@@ -45,6 +45,8 @@ class Settings(BaseSettings):
 
     # ── CORS (frontend origin) ─────────────────────────────────────
     cors_allowed_origins: str = "http://localhost:3000"
+    # Base URL of the deployed frontend (used to build password-reset links in email).
+    frontend_url: str = "http://localhost:3000"
 
     # ── Auth cookies (opt-in: JWT in HttpOnly cookies; frontend off localStorage) ──
     # When true, login/register/refresh also set the JWT as HttpOnly cookies. Backward
@@ -67,8 +69,9 @@ class Settings(BaseSettings):
     # ── Email (optional) ───────────────────────────────────────────
     email_host: str = "smtp.gmail.com"
     email_port: int = 587
-    email_host_user: str = ""
-    email_host_password: str = ""
+    email_host_user: str = ""  # Gmail address (prod: enables real delivery)
+    email_host_password: str = ""  # Google App Password (16 chars) — see .env.example
+    default_from_email: str = ""  # From-address; defaults to email_host_user
 
     # ── Optional AI assistant (CrownBot) ────────────────────────────
     # Either set ANTHROPIC_API_KEY, OR set the LLM_* vars for any OpenAI-compatible provider
