@@ -84,11 +84,11 @@ export default function Navbar() {
 
         <button
           onClick={() => setOpen((o) => !o)}
-          aria-label="Toggle menu"
           aria-expanded={open}
           className="btn-ghost px-3 lg:hidden"
         >
-          {open ? "✕" : "☰"}
+          <span aria-hidden="true">{open ? "✕" : "☰"}</span>
+          <span className="sr-only">{open ? "Close menu" : "Open menu"}</span>
         </button>
       </nav>
 

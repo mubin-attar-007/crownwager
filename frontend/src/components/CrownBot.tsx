@@ -74,7 +74,7 @@ export default function CrownBot() {
         aria-expanded={open}
         className="group fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-full bg-brand-gradient px-5 py-3 font-bold text-ink-950 shadow-glow transition hover:brightness-110"
       >
-        {open ? "✕ Close" : <><LogoMark size={20} /> CrownBot</>}
+        {open ? <><span aria-hidden="true">✕</span> Close</> : <><LogoMark size={20} /> CrownBot</>}
       </button>
 
       {open && (
@@ -124,8 +124,9 @@ export default function CrownBot() {
               onChange={(e) => setInput(e.target.value)}
               aria-label="Message CrownBot"
             />
-            <button className="btn-primary" disabled={busy} aria-label="Send">
-              ➤
+            <button className="btn-primary" disabled={busy}>
+              <span aria-hidden="true">➤</span>
+              <span className="sr-only">Send</span>
             </button>
           </form>
         </div>
