@@ -10,7 +10,7 @@ export default function TermsPage() {
   return (
     <article className="mx-auto max-w-3xl py-4 leading-relaxed text-slate-300 [&_h2]:mt-8 [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-white [&_p]:mt-3">
       <h1 className="text-3xl font-extrabold text-white">Terms of Service</h1>
-      <p className="text-sm text-slate-500">Last updated: June 2026</p>
+      <p className="text-sm text-slate-400">Last updated: June 2026</p>
 
       <h2>1. What CrownWager is</h2>
       <p>
@@ -57,7 +57,7 @@ export default function TermsPage() {
 
       <h2>7. Changes</h2>
       <p>We may update these terms; continued use means you accept the changes. See also our{" "}
-        <Link href="/privacy" className="text-brand-300">Privacy Policy</Link>.
+        <Link href="/privacy" className="text-brand-300 underline underline-offset-2">Privacy Policy</Link>.
       </p>
     </article>
   );

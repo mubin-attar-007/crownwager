@@ -62,7 +62,7 @@ export default function Footer() {
           ))}
         </div>
 
-        <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-white/[0.06] pt-6 text-xs text-slate-500 sm:flex-row">
+        <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-white/[0.06] pt-6 text-xs text-slate-400 sm:flex-row">
           <p>© {new Date().getFullYear()} CrownWager — data-driven sports analytics.</p>
           <div className="flex items-center gap-4">
             <Link href="/terms" className="hover:text-brand-300">Terms</Link>

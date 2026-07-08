@@ -70,17 +70,17 @@ function RegisterForm() {
         )}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="label">First name</label>
-            <input className="input" value={form.first_name} onChange={set("first_name")} required />
+            <label className="label" htmlFor="first_name">First name</label>
+            <input id="first_name" className="input" value={form.first_name} onChange={set("first_name")} required />
           </div>
           <div>
-            <label className="label">Last name</label>
-            <input className="input" value={form.last_name} onChange={set("last_name")} required />
+            <label className="label" htmlFor="last_name">Last name</label>
+            <input id="last_name" className="input" value={form.last_name} onChange={set("last_name")} required />
           </div>
         </div>
         <div>
-          <label className="label">Email</label>
-          <input type="email" className="input" value={form.email} onChange={set("email")} required />
+          <label className="label" htmlFor="reg_email">Email</label>
+          <input id="reg_email" type="email" className="input" value={form.email} onChange={set("email")} required />
         </div>
         <div>
           <label className="label" htmlFor="pw">Password</label>
@@ -93,7 +93,7 @@ function RegisterForm() {
             required
             describedBy="pw-hint"
           />
-          <p id="pw-hint" className="mt-1.5 text-xs text-slate-500">
+          <p id="pw-hint" className="mt-1.5 text-xs text-slate-400">
             At least 8 characters — avoid common or all-numeric passwords.
           </p>
         </div>

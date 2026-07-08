@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useApi } from "@/lib/useApi";
 import SportSelector from "@/components/SportSelector";
+import EdgeTierCharts from "@/components/EdgeTierCharts";
 import { Empty, ErrorState, Loading, SectionHeading, StatTile } from "@/components/ui";
 import type { ModelRecord } from "@/lib/types";
 
@@ -61,6 +62,8 @@ export default function ModelRecordPage() {
             <StatTile label="Units P&L" value={signedUnits(data.overall.units_profit)} sub="flat 1u / pick" />
             <StatTile label="ROI" value={`${parseFloat(data.overall.roi_pct).toFixed(1)}%`} sub="on units risked" />
           </div>
+
+          <EdgeTierCharts tiers={data.by_edge_tier} />
 
           <div className="card overflow-hidden p-0">
             <div className="border-b border-white/[0.06] px-5 py-3">

@@ -89,7 +89,7 @@ export default function Home() {
         <div className="grid gap-6 md:grid-cols-3">
           {STEPS.map((s) => (
             <div key={s.n} className="relative">
-              <div className="text-5xl font-extrabold text-white/10 font-display">{s.n}</div>
+              <div className="font-display text-3xl font-extrabold text-brand-400/80">{s.n}</div>
               <h3 className="mt-2 text-lg font-bold text-white">{s.title}</h3>
               <p className="mt-2 text-sm text-slate-400">{s.desc}</p>
             </div>
